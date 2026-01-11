@@ -1,111 +1,124 @@
--- ============================================================
--- SCRIPT SQL - HOPITAL CENTRAL
--- Basé sur le Diagramme de Classes UML fourni
--- ============================================================
+-- 1. Création de la base de données
+CREATE DATABASE gestion_hopital;
 
-DROP DATABASE IF EXISTS hopital_central_db;
-CREATE DATABASE hopital_central_db;
-USE hopital_central_db;
+-- 2. Sélection de la base pour travailler dessus
+USE gestion_hopital;
 
--- 1. Table SERVICE 
--- Relation: Un service contient plusieurs employés
+-- ============================================================
+-- TABLE 1 : SERVICES (Ex: Cardiologie, IT, RH...)
+-- ============================================================
 CREATE TABLE service (
     id_service INT AUTO_INCREMENT PRIMARY KEY,
-    nomService VARCHAR(50) NOT NULL,
+    nom_service VARCHAR(50) NOT NULL,
     etage INT NOT NULL
 );
 
--- 2. Table EMPLOYE (Héritage Single Table)
--- Contient tous les acteurs: Medecin, Infirmier, Technicien, RH
+-- ============================================================
+-- TABLE 2 : EMPLOYES (Table unique pour RH, Médecin, Infirmier...)
+-- ============================================================
 CREATE TABLE employe (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(50) NOT NULL,
     prenom VARCHAR(50) NOT NULL,
-    login VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(50) NOT NULL,
-    salaire FLOAT NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL, 
+    password VARCHAR(255) NOT NULL,
+    salaire FLOAT, 
     
-    -- Colonne pour savoir quel est le rôle (Discriminator)
-    type_employe ENUM('MEDECIN', 'INFIRMIER', 'TECHNICIEN', 'RH') NOT NULL,
+    -- Le rôle (Trés important pour le Login en Java)
+    role ENUM('RH', 'MEDECIN', 'INFIRMIER', 'TECHNICIEN') NOT NULL,
     
-    -- Attributs spécifiques (NULL si non concerné)
-    specialite VARCHAR(50),  -- Pour MEDECIN
-    grade VARCHAR(50),       -- Pour INFIRMIER
-    domaine VARCHAR(50),     -- Pour TECHNICIEN
-    -- RH n'a pas d'attribut spécifique dans le diagramme, c'est OK.
+    -- Informations spécifiques (Optionnelles selon le rôle)
+    specialite VARCHAR(50),  -- Pour les Médecins
+    grade VARCHAR(50),       -- Pour les Infirmiers
+    domaine VARCHAR(50),     -- Pour les Techniciens (ex: Réseau, Biomédical)
     
-    -- Relation: Appartient à un Service
+    -- Lien avec le Service
     id_service INT,
-    FOREIGN KEY (id_service) REFERENCES service(id_service) ON DELETE SET NULL
+    FOREIGN KEY (id_service) REFERENCES service(id_service)
 );
 
--- 3. Table CONSULTATION
--- Relation: Gérée par un Médecin
-CREATE TABLE consultation (
-    id_consultation INT AUTO_INCREMENT PRIMARY KEY,
-    date_consultation DATE NOT NULL,
-    heure VARCHAR(10) NOT NULL, -- String dans le diagramme
-    diagnostic TEXT,
-    prescription TEXT,
-    
-    id_medecin INT NOT NULL,
-    FOREIGN KEY (id_medecin) REFERENCES employe(id) ON DELETE CASCADE
-);
-
--- 4. Table EXAMEN
--- Relation: Gérée par un Infirmier
-CREATE TABLE examen (
-    id_examen INT AUTO_INCREMENT PRIMARY KEY,
-    typeExamen VARCHAR(100) NOT NULL,
-    resultat TEXT,
-    
-    id_infirmier INT NOT NULL,
-    FOREIGN KEY (id_infirmier) REFERENCES employe(id) ON DELETE CASCADE
-);
-
--- 5. Table MACHINE
--- Relation: Traitée par un Technicien
-CREATE TABLE machine (
-    id_machine INT AUTO_INCREMENT PRIMARY KEY,
-    reference VARCHAR(50) UNIQUE NOT NULL,
+-- ============================================================
+-- TABLE 3 : PATIENTS (Les malades)
+-- ============================================================
+CREATE TABLE patient (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(50) NOT NULL,
-    etat VARCHAR(50) DEFAULT 'Fonctionnel',
+    prenom VARCHAR(50) NOT NULL,
+    telephone VARCHAR(20),
+    sexe ENUM('M', 'F'),
+    date_naissance DATE
+);
+
+-- ============================================================
+-- TABLE 4 : RENDEZ-VOUS (Lien Patient <-> Médecin)
+-- ============================================================
+CREATE TABLE rendez_vous (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    date_heure DATETIME NOT NULL,
+    statut ENUM('EN_ATTENTE', 'CONFIRME', 'ANNULE', 'TERMINE') DEFAULT 'EN_ATTENTE',
     
+    id_patient INT NOT NULL,
+    id_medecin INT NOT NULL,
+    
+    FOREIGN KEY (id_patient) REFERENCES patient(id),
+    FOREIGN KEY (id_medecin) REFERENCES employe(id)
+);
+
+-- ============================================================
+-- TABLE 5 : CONSULTATIONS (Le dossier médical après RDV)
+-- ============================================================
+CREATE TABLE consultation (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    diagnostic TEXT,
+    traitement TEXT,
+    
+    -- Une consultation appartient à un seul RDV
+    id_rendez_vous INT UNIQUE NOT NULL,
+    FOREIGN KEY (id_rendez_vous) REFERENCES rendez_vous(id)
+);
+
+-- ============================================================
+-- TABLE 6 : MACHINES (Pour les Techniciens)
+-- ============================================================
+CREATE TABLE machine (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(50) NOT NULL,
+    etat ENUM('FONCTIONNEL', 'EN_PANNE', 'HORS_SERVICE') DEFAULT 'FONCTIONNEL',
+    
+    -- Quel technicien s'occupe de cette machine ?
     id_technicien INT,
-    FOREIGN KEY (id_technicien) REFERENCES employe(id) ON DELETE SET NULL
+    FOREIGN KEY (id_technicien) REFERENCES employe(id)
 );
 
--- 6. Table CONGE
--- Relation: Demandé par Employé, Validé par RH
+-- ============================================================
+-- TABLE 7 : CONGÉS (Pour les RH)
+-- ============================================================
 CREATE TABLE conge (
-    id_conge INT AUTO_INCREMENT PRIMARY KEY,
-    dateDebut DATE NOT NULL,
-    dateFin DATE NOT NULL,
-    statut VARCHAR(20) DEFAULT 'En attente',
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    date_debut DATE NOT NULL,
+    date_fin DATE NOT NULL,
+    statut ENUM('EN_ATTENTE', 'VALIDE', 'REFUSE') DEFAULT 'EN_ATTENTE',
     
-    -- Qui demande ? (Tout employé)
-    id_demandeur INT NOT NULL,
-    FOREIGN KEY (id_demandeur) REFERENCES employe(id) ON DELETE CASCADE,
-    
-    -- Qui valide ? (Un RH)
-    id_valideur INT,
-    FOREIGN KEY (id_valideur) REFERENCES employe(id) ON DELETE SET NULL
+    id_employe INT NOT NULL, -- Celui qui demande le congé
+    FOREIGN KEY (id_employe) REFERENCES employe(id)
 );
 
 -- ============================================================
--- JEU DE DONNÉES DE TEST (INSERT)
+-- JEU DE DONNÉES DE TEST (Données initiales)
 -- ============================================================
 
-INSERT INTO service (nomService, etage) VALUES ('Cardiologie', 1), ('Informatique', 0), ('Administration', 2);
+-- Ajouter des Services
+INSERT INTO service (nom_service, etage) VALUES 
+('Administration', 1),
+('Cardiologie', 2),
+('Informatique', 0);
 
--- Ajout d'un RH
-INSERT INTO employe (nom, prenom, login, password, salaire, type_employe, id_service) 
-VALUES ('Directeur', 'Paul', 'admin', '1234', 4000, 'RH', 3);
+-- Ajouter des Employés (Mot de passe '1234' pour tous)
+INSERT INTO employe (nom, prenom, email, password, role, id_service, specialite, domaine) VALUES 
+('Benani', 'Ahmed', 'rh@hopital.com', '1234', 'RH', 1, NULL, NULL),
+('Dr. Alami', 'Sara', 'sara@hopital.com', '1234', 'MEDECIN', 2, 'Cardiologue', NULL),
+('Tazi', 'Karim', 'tech@hopital.com', '1234', 'TECHNICIEN', 3, NULL, 'Maintenance');
 
--- Ajout d'un Médecin
-INSERT INTO employe (nom, prenom, login, password, salaire, type_employe, specialite, id_service) 
-VALUES ('House', 'Greg', 'house', '1234', 6000, 'MEDECIN', 'Diagnisticien', 1);
-
--- Ajout d'un Technicien
-INSERT INTO employe (nom, prenom, login, password, salaire, type_employe, domaine, id_service) 
-VALUES ('Robot', 'Elliot', 'tech', '1234', 2500, 'TECHNICIEN', 'Reseau', 2);
+-- Ajouter un Patient
+INSERT INTO patient (nom, prenom, telephone, sexe, date_naissance) VALUES 
+('Mansouri', 'Yassine', '0661123456', 'M', '1995-05-20');
