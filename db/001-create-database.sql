@@ -1,4 +1,11 @@
 -- =============================================
+-- DROP & CREATE DATABASE
+-- =============================================
+DROP DATABASE IF EXISTS hopital;
+CREATE DATABASE hospital_management;
+use hospital_management ;-- connect to the new database
+
+-- =============================================
 -- HOSPITAL MANAGEMENT DATABASE SCHEMA
 -- =============================================
 
@@ -12,7 +19,7 @@ CREATE TABLE employees (
     role VARCHAR(50) NOT NULL CHECK (role IN ('RH', 'Médecin', 'Infirmier', 'Technicien')),
     department VARCHAR(100),
     phone VARCHAR(20),
-    hire_date DATE DEFAULT CURRENT_DATE,
+    hire_date DATE DEFAULT (CURRENT_DATE),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -38,7 +45,7 @@ CREATE TABLE patients (
 CREATE TABLE consultations (
     id SERIAL PRIMARY KEY,
     patient_id INTEGER NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
-    doctor_id INTEGER NOT NULL REFERENCES employees(id) ON DELETE SET NULL,
+    doctor_id INTEGER REFERENCES employees(id) ON DELETE SET NULL,
     date TIMESTAMP NOT NULL,
     reason VARCHAR(255) NOT NULL,
     diagnosis TEXT,
@@ -53,7 +60,7 @@ CREATE TABLE consultations (
 CREATE TABLE appointments (
     id SERIAL PRIMARY KEY,
     patient_id INTEGER NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
-    doctor_id INTEGER NOT NULL REFERENCES employees(id) ON DELETE SET NULL,
+    doctor_id INTEGER REFERENCES employees(id) ON DELETE SET NULL,
     date TIMESTAMP NOT NULL,
     duration_minutes INTEGER DEFAULT 30,
     type VARCHAR(100) NOT NULL,
