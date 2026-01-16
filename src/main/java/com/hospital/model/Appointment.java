@@ -12,11 +12,13 @@ public class Appointment{
     private String type;
     private String status;
     private String notes;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     public Appointment(){
 
     }
-    public Appointment(int id,int patientId,int doctorId,Timestamp date,int durationMinutes,String type,String status,String notes){
+    public Appointment(int id,int patientId,int doctorId,Timestamp date,int durationMinutes,String type,String status,String notes,Timestamp createdAt, Timestamp updatedAt){
         this.id =id;
         this.patientId = patientId;
         this.doctorId =doctorId;
@@ -25,8 +27,21 @@ public class Appointment{
         this.type =type;
         this.status=status;
         this.notes=notes;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
 
-
+    }
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
     //getters
     public int getId() {
@@ -122,9 +137,5 @@ public class Appointment{
     public String toString() {
         return "RDV [ID=" + id + ", Patient=" + patientId + ", Doctor=" + doctorId + ", Date=" + getFormattedDate() + "]";
     }
-
-
-
-
 
 }

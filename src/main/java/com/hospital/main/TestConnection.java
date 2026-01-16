@@ -10,7 +10,7 @@ public class TestConnection {
         // Change "test_db" to the name of your database in phpMyAdmin/MySQL
         String url = "jdbc:mysql://localhost:3306/hospital_management?characterEncoding=utf8"; 
         String user = "root"; // Default for XAMPP is "root"
-        String password = "Admin123!"; // Default for XAMPP is empty ("")
+        String password = "root"; // Default for XAMPP is empty ("")
 
         System.out.println("⏳ Connecting to database...");
 

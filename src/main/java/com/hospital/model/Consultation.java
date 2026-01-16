@@ -13,11 +13,13 @@ public class Consultation{
     private String prescription;
     private String notes;
     private String status;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     public Consultation() {}
 
     public Consultation(int id, int patientId, int doctorId, Timestamp date, String reason, 
-                        String diagnosis, String prescription, String notes, String status) {
+                        String diagnosis, String prescription, String notes, String status,Timestamp createdAt,Timestamp updatedAt) {
         this.id = id;
         this.patientId = patientId;
         this.doctorId = doctorId;
@@ -27,8 +29,26 @@ public class Consultation{
         this.prescription = prescription;
         this.notes = notes;
         this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
     //getters
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
     public int getId() {
         return id;

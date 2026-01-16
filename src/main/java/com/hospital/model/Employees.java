@@ -1,5 +1,6 @@
 package main.java.com.hospital.model;
 import java.sql.Date;
+import java.sql.Timestamp;
 
 public class Employees{
     private int id;
@@ -11,13 +12,15 @@ public class Employees{
     private String department;
     private String phone;
     private Date hireDate;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
     
     //constructeurs
 
     public Employees(){
 
     }
-    public Employees(int id ,String email,String passwordHash,String firstName,String lastName,String role,String departement,String phone,Date hirDate){
+    public Employees(int id ,String email,String passwordHash,String firstName,String lastName,String role,String departement,String phone,Date hireDate,Timestamp createdAt,Timestamp updatedAt){
         this.id=id;
         this.email=email;
         this.passwordHash=passwordHash;
@@ -27,6 +30,20 @@ public class Employees{
         this.department=departement;
         this.phone=phone;
         this.hireDate=hireDate;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
     //setters
     public void setId(int id) {
