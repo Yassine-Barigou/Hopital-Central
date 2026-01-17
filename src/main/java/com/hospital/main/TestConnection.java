@@ -4,13 +4,15 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import main.java.com.hospital.gui.LoginWindow;
+
 public class TestConnection {
     public static void main(String[] args) {
         // --- CONFIGURATION ---
         // Change "test_db" to the name of your database in phpMyAdmin/MySQL
         String url = "jdbc:mysql://localhost:3306/hospital_management?characterEncoding=utf8"; 
         String user = "root"; // Default for XAMPP is "root"
-        String password = "root"; // Default for XAMPP is empty ("")
+        String password = "Admin123!"; // Default for XAMPP is empty ("")
 
         System.out.println("⏳ Connecting to database...");
 
@@ -35,5 +37,8 @@ public class TestConnection {
             System.out.println("2. Is the database name correct?");
             e.printStackTrace();
         }
+        LoginWindow window = new LoginWindow();
+        
     }
+    
 }
