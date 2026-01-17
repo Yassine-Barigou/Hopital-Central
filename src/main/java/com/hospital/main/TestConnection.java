@@ -1,44 +1,39 @@
-package main.java.com.hospital.main; // Keep your package name
+package main.java.com.hospital.main; 
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import javax.swing.SwingUtilities;
 
 import main.java.com.hospital.gui.LoginWindow;
+import main.java.com.hospital.util.DBConnection;
 
 public class TestConnection {
+
     public static void main(String[] args) {
-        // --- CONFIGURATION ---
-        // Change "test_db" to the name of your database in phpMyAdmin/MySQL
-        String url = "jdbc:mysql://localhost:3306/hospital_management?characterEncoding=utf8"; 
-        String user = "root"; // Default for XAMPP is "root"
-        String password = "Admin123!"; // Default for XAMPP is empty ("")
-
-        System.out.println("⏳ Connecting to database...");
-
-        try {
-            // 1. Load Driver
-            Class.forName("com.mysql.jdbc.Driver");
-            
-            // 2. Attempt Connection
-            Connection conn = DriverManager.getConnection(url, user, password);
-            
-            if (conn != null) {
-                System.out.println("✅ CONNECTION SUCCESSFUL!");
-                System.out.println("You are connected to: " + url);
-            }
-            
-        } catch (ClassNotFoundException e) {
-            System.out.println("❌ Error: MySQL Driver not found in 'lib' folder.");
-            e.printStackTrace();
-        } catch (SQLException e) {
-            System.out.println("❌ Error: Could not connect to MySQL.");
-            System.out.println("1. Is XAMPP/MySQL running?");
-            System.out.println("2. Is the database name correct?");
-            e.printStackTrace();
-        }
-        LoginWindow window = new LoginWindow();
         
+        try (Connection conn = DBConnection.getConnection()) {
+            if (conn != null && !conn.isClosed()) {
+                System.out.println("✅ SUCCÈS : La connexion est établie avec 'hospital_management' !");
+                System.out.println("📊 Version du serveur : " + conn.getMetaData().getDatabaseProductVersion());
+
+                // 2. Si la connexion réussit, on lance l'interface graphique
+                // On utilise SwingUtilities pour s'assurer que l'interface tourne sur le bon thread
+                SwingUtilities.invokeLater(() -> {
+                    LoginWindow window = new LoginWindow();
+                    window.setVisible(true); // Assure-toi que la fenêtre est visible
+                });
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ ÉCHEC : Impossible de se connecter à la base de données.");
+            System.err.println("Détail de l'erreur : " + e.getMessage());
+            e.printStackTrace();
+            
+            // Optionnel : Afficher un message d'erreur si même la connexion échoue au démarrage
+            javax.swing.JOptionPane.showMessageDialog(null, 
+                "Erreur de connexion à la base de données :\n" + e.getMessage(), 
+                "Erreur Fatale", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
     }
     
 }

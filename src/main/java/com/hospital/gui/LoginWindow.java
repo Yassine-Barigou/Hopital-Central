@@ -2,6 +2,11 @@ package main.java.com.hospital.gui;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import main.java.com.hospital.dao.EmployeesDAO;
+import main.java.com.hospital.gui.panels.TechnicianDashboard;
+import main.java.com.hospital.model.Employees;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -147,28 +152,31 @@ buttonGroup.add(loginButton);
 
 card.add(buttonGroup);
 
+loginButton.addActionListener(e -> {
+    String email = emailField.getText();
+    String password = new String(passwordField.getPassword());
+
+    EmployeesDAO dao = new EmployeesDAO();
+    Employees user = dao.checkLogin(email, password);
+
+    if (user != null) {
+        String role = user.getRole(); 
+        
+        // 1. Redirection vers la fenêtre principale (DashboardWindow)
+        // On passe l'objet 'user' à la fenêtre pour qu'elle sache qui est connecté
+        DashboardWindow dashboard = new DashboardWindow(user); 
+        dashboard.setVisible(true); 
+        
+        this.dispose(); // Ferme le login
+    } else {
+        JOptionPane.showMessageDialog(this, "Email ou mot de passe incorrect", "Erreur", JOptionPane.ERROR_MESSAGE);
+    }
+});
 
 
 
 
         
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        setVisible(true);
     }
 
 private JLabel createLabel(String text) {
