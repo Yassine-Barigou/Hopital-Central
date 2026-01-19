@@ -56,8 +56,8 @@ public class  LoginWindow extends JFrame{
         g2.setColor(new Color(232, 241, 242)); 
         g2.fillOval(0, 0, getWidth() - 1, getHeight() - 1);
         g2.dispose();
-    }
-};
+        }
+        };
 
        
 iconCircle.setLayout(new GridBagLayout()); // Pour centrer l'icône parfaitement
@@ -158,6 +158,7 @@ loginButton.addActionListener(e -> {
 
     EmployeesDAO dao = new EmployeesDAO();
     Employees user = dao.checkLogin(email, password);
+    System.out.print(user);
 
     if (user != null) {
         String role = user.getRole(); 
@@ -178,6 +179,7 @@ loginButton.addActionListener(e -> {
 
         
     }
+    //HHH
 
 private JLabel createLabel(String text) {
     JLabel label = new JLabel(text);
@@ -269,10 +271,5 @@ private void styleButton(JButton button) {
             super.paint(g, c);
         }
     });
+}       
 }
-
-        
-
-        
-}
-
