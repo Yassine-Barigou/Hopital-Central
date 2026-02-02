@@ -2,6 +2,7 @@ package main.java.com.hospital.gui;
 
 import main.java.com.hospital.gui.panels.EmployeesPanel;
 import main.java.com.hospital.gui.panels.HomePanel;
+import main.java.com.hospital.gui.panels.TechnicianDashboard;
 import main.java.com.hospital.model.Employees;
 
 import javax.swing.*;
@@ -31,11 +32,17 @@ public class DashboardWindow extends JFrame {
 
         mainContentPanel.add(new HomePanel(user), "HOME");
         mainContentPanel.add(new EmployeesPanel(), "EMPLOYES");
+        mainContentPanel.add(new TechnicianDashboard(user), "TECHNICIEN");
 
         add(createSidebar(user), BorderLayout.WEST);
         add(mainContentPanel, BorderLayout.CENTER);
-
+        
+        if("Technicien".equalsIgnoreCase(user.getRole())){
+            cardLayout.show(mainContentPanel, "TECHNICIEN");
+        }else{
+        
         cardLayout.show(mainContentPanel, "HOME");
+        }
     }
 
     private JPanel createSidebar(Employees user) {
@@ -70,6 +77,12 @@ public class DashboardWindow extends JFrame {
                 updateMenuStyles(empBtn);
             });
             topPanel.add(empBtn);
+
+        }
+        if("Technicien".equalsIgnoreCase(user.getRole())){
+            JButton eqButton =  createSidebarButton("Equipement",false);
+            
+
         }
 
         sidebar.add(topPanel, BorderLayout.NORTH);

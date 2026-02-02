@@ -2,6 +2,8 @@ package main.java.com.hospital.gui.panels;
 
 import main.java.com.hospital.dao.EmployeesDAO;
 import main.java.com.hospital.model.Employees;
+import main.java.com.hospital.gui.panels.HomePanel;
+
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -16,6 +18,8 @@ public class EmployeesPanel extends JPanel {
     private EmployeesDAO dao = new EmployeesDAO();
 
     public EmployeesPanel() {
+        
+        
         setLayout(new BorderLayout(10, 10));
         JLabel title = new JLabel("Gestion des Employés");
         title.setFont(new Font("SansSerif", Font.BOLD, 18));
