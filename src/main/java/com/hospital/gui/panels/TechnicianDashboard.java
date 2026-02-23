@@ -10,12 +10,6 @@ import java.util.Map;
 import java.util.List;
 
 
-
-    
-
-        
-
-
 public class  TechnicianDashboard extends JPanel{
     private EquipementDAO dao = new EquipementDAO();
     
@@ -50,8 +44,8 @@ public class  TechnicianDashboard extends JPanel{
         card.setBackground(Color.WHITE);
         card.setPreferredSize(new Dimension(0, 140));
         card.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(230, 230, 230), 1),
-            new EmptyBorder(20, 20, 20, 20)
+        BorderFactory.createLineBorder(new Color(230, 230, 230), 1),
+        new EmptyBorder(20, 20, 20, 20)
         ));
 
         JLabel lblTitle = new JLabel(title);

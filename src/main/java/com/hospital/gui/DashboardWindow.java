@@ -4,6 +4,7 @@ import main.java.com.hospital.gui.panels.EmployeesPanel;
 import main.java.com.hospital.gui.panels.HomePanel;
 import main.java.com.hospital.gui.panels.TechnicianDashboard;
 import main.java.com.hospital.model.Employees;
+import main.java.com.hospital.gui.panels.EquipmentPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,6 +34,9 @@ public class DashboardWindow extends JFrame {
         mainContentPanel.add(new HomePanel(user), "HOME");
         mainContentPanel.add(new EmployeesPanel(), "EMPLOYES");
         mainContentPanel.add(new TechnicianDashboard(user), "TECHNICIEN");
+        mainContentPanel.add(new EquipmentPanel(),"EQUIPEMENTS");
+
+
 
         add(createSidebar(user), BorderLayout.WEST);
         add(mainContentPanel, BorderLayout.CENTER);
@@ -64,7 +68,12 @@ public class DashboardWindow extends JFrame {
 
         JButton homeBtn = createSidebarButton("🏠 Dashboard", true);
         homeBtn.addActionListener(e -> {
-            cardLayout.show(mainContentPanel, "HOME");
+            
+            if ("Technicien".equalsIgnoreCase(user.getRole())) {
+                cardLayout.show(mainContentPanel, "TECHNICIEN");
+            } else {
+                cardLayout.show(mainContentPanel, "HOME");
+            }
             updateMenuStyles(homeBtn);
         });
         topPanel.add(homeBtn);
@@ -80,7 +89,14 @@ public class DashboardWindow extends JFrame {
 
         }
         if("Technicien".equalsIgnoreCase(user.getRole())){
-            JButton eqButton =  createSidebarButton("Equipement",false);
+            JButton eqButton = createSidebarButton("🔧 Équipements", false);
+            eqButton.addActionListener(e -> {
+                cardLayout.show(mainContentPanel, "EQUIPEMENTS");
+                updateMenuStyles(eqButton);
+            });
+
+            topPanel.add(eqButton);
+            topPanel.add(Box.createVerticalStrut(10));
             
 
         }
