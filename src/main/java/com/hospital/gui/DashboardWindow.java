@@ -2,6 +2,7 @@ package main.java.com.hospital.gui;
 
 import main.java.com.hospital.gui.panels.EmployeesPanel;
 import main.java.com.hospital.gui.panels.HomePanel;
+import main.java.com.hospital.gui.panels.MaintenancePanel;
 import main.java.com.hospital.gui.panels.TechnicianDashboard;
 import main.java.com.hospital.gui.panels.EquipmentPanel;
 import main.java.com.hospital.gui.panels.PatientsPanel; 
@@ -38,8 +39,9 @@ public class DashboardWindow extends JFrame {
         mainContentPanel.add(new EmployeesPanel(), "EMPLOYES");
         mainContentPanel.add(new TechnicianDashboard(user), "TECHNICIEN");
         mainContentPanel.add(new EquipmentPanel(), "EQUIPEMENTS");
-        mainContentPanel.add(new PatientsPanel(), "PATIENTS"); 
-        mainContentPanel.add(new ConsultationsPanel(), "CONSULTATIONS"); // ✨ ZEDNA L-PANEL HNA
+        mainContentPanel.add(new PatientsPanel(), "PATIENTS");
+        mainContentPanel.add(new ConsultationsPanel(), "CONSULTATIONS");
+        mainContentPanel.add(new MaintenancePanel(), "MAINTENANCE");
 
         // 2. Ajouter la sidebar et le contenu principal
         add(createSidebar(user), BorderLayout.WEST);
@@ -50,7 +52,7 @@ public class DashboardWindow extends JFrame {
         if ("Technicien".equalsIgnoreCase(role)) {
             cardLayout.show(mainContentPanel, "TECHNICIEN");
         } else if ("Médecin".equalsIgnoreCase(role)) {
-            cardLayout.show(mainContentPanel, "PATIENTS"); // Le médecin voit les patients par défaut
+            cardLayout.show(mainContentPanel, "PATIENTS");
         } else {
             cardLayout.show(mainContentPanel, "HOME");
         }
@@ -78,7 +80,7 @@ public class DashboardWindow extends JFrame {
         boolean isDefault = !isTech && !isMed; 
 
         // 1. Bouton Dashboard (Home)
-        JButton homeBtn = createSidebarButton("🏠 Dashboard", isDefault);
+        JButton homeBtn = createSidebarButton("🏠 Dashboard", true);
         homeBtn.addActionListener(e -> {
             if ("Technicien".equalsIgnoreCase(user.getRole())) {
                 cardLayout.show(mainContentPanel, "TECHNICIEN");
@@ -125,12 +127,21 @@ public class DashboardWindow extends JFrame {
 
         // 4. Bouton Équipements (Technicien & Admin)
         if ("Technicien".equalsIgnoreCase(user.getRole()) || "Admin".equalsIgnoreCase(user.getRole())) {
-            JButton eqButton = createSidebarButton("🔧 Équipements", isTech);
+            JButton eqButton = createSidebarButton("🔧 Équipements", false);
             eqButton.addActionListener(e -> {
                 cardLayout.show(mainContentPanel, "EQUIPEMENTS");
                 updateMenuStyles(eqButton);
             });
             topPanel.add(eqButton);
+            topPanel.add(Box.createVerticalStrut(10));
+
+            JButton maintButton = createSidebarButton("📈 Maintenance", false);
+            maintButton.addActionListener(e -> {
+                
+                cardLayout.show(mainContentPanel, "MAINTENANCE");
+                updateMenuStyles(maintButton);
+            });
+            topPanel.add(maintButton);
             topPanel.add(Box.createVerticalStrut(10));
         }
 

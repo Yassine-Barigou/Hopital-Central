@@ -221,13 +221,119 @@ public class EquipementDAO {
             stmt.setString(4, eq.getStatus());
             stmt.setDate(5, eq.getPurchase_date());
             stmt.setDate(6, eq.getNext_maintenance_date());
-            stmt.setInt(7, eq.getId()); // L'ID caché est crucial ici !
+            stmt.setInt(7, eq.getId());
             
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
             
         } catch (SQLException e) {
             System.err.println("Erreur lors de la modification : " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    // 1. Compter les équipements EN RETARD (date passée)
+    public int getRetardCount() {
+        String req = "SELECT COUNT(*) FROM equipment WHERE next_maintenance_date < CURDATE()";
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(req);
+            ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // 2. Compter les équipements URGENTS (entre aujourd'hui et dans 7 jours)
+    public int getUrgentCount() {
+        String req = "SELECT COUNT(*) FROM equipment WHERE next_maintenance_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)";
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(req);
+            ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    
+    // 1. Compter les maintenances EN RETARD (date passée)
+    public int countMaintenanceEnRetard() {
+        String req = "SELECT COUNT(*) FROM equipment WHERE next_maintenance_date < CURDATE()";
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(req);
+            ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // < 7 jours
+    public int countMaintenanceUrgente() {
+        String req = "SELECT COUNT(*) FROM equipment WHERE next_maintenance_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)";
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(req);
+            ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // < 30 jours
+    public int countMaintenanceAVenir() {
+        String req = "SELECT COUNT(*) FROM equipment WHERE next_maintenance_date BETWEEN DATE_ADD(CURDATE(), INTERVAL 8 DAY) AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)";
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(req);
+            ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    //le tableau de maintenance (Triée par date la plus proche)
+    public List<Equipment> getListePourPlanningMaintenance() {
+        List<Equipment> list = new ArrayList<>();
+        String req = "SELECT * FROM equipment ORDER BY next_maintenance_date ASC";
+        
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(req);
+            ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                Equipment eq = new Equipment();
+                eq.setId(rs.getInt("id"));
+                eq.setName(rs.getString("name"));
+                eq.setType(rs.getString("type"));
+                eq.setLocation(rs.getString("location"));
+                eq.setStatus(rs.getString("status"));
+                eq.setNext_maintenance_date(rs.getDate("next_maintenance_date"));
+                list.add(eq);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    public boolean deleteEquipement(int id) {
+        String req = "DELETE FROM equipment WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(req)) {
+            
+            stmt.setInt(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la suppression : " + e.getMessage());
             e.printStackTrace();
             return false;
         }
