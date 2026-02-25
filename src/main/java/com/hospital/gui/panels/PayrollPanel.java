@@ -6,6 +6,8 @@ import main.java.com.hospital.model.Employees;
 import main.java.com.hospital.model.Payroll;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
@@ -18,30 +20,44 @@ public class PayrollPanel extends JPanel {
     private EmployeesDAO empDAO = new EmployeesDAO();
 
     public PayrollPanel() {
-        setLayout(new BorderLayout(10, 10));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setLayout(new BorderLayout(20, 20));
+        setBackground(Color.WHITE);
+        setBorder(new EmptyBorder(25, 25, 25, 25));
 
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
+        
         JLabel title = new JLabel("💰 Gestion de la Paie");
-        title.setFont(new Font("SansSerif", Font.BOLD, 20));
-        add(title, BorderLayout.NORTH);
+        title.setFont(new Font("SansSerif", Font.BOLD, 24));
+        title.setForeground(new Color(30, 41, 59));
+        
+        JLabel subtitle = new JLabel("Historique des paiements et gestion des salaires nets");
+        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        subtitle.setForeground(Color.GRAY);
+        
+        headerPanel.add(title, BorderLayout.NORTH);
+        headerPanel.add(subtitle, BorderLayout.SOUTH);
+        add(headerPanel, BorderLayout.NORTH);
 
         String[] cols = {"ID", "Employé", "Mois", "Année", "Base (MAD)", "Primes", "Déductions", "NET (MAD)", "Date Paiement"};
         model = new DefaultTableModel(cols, 0) {
+            @Override
             public boolean isCellEditable(int row, int column) { return false; }
         };
+        
         table = new JTable(model);
-        table.setRowHeight(30);
-        table.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));
+        setupTableStyle();
         
         JScrollPane scroll = new JScrollPane(table);
+        scroll.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240)));
         add(scroll, BorderLayout.CENTER);
 
-        // Boutons
-        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton btnAdd = new JButton("➕ Nouveau Paiement");
-        JButton btnDelete = new JButton("🗑️ Annuler Paiement");
-        btnDelete.setForeground(Color.RED);
-        
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        btnPanel.setOpaque(false);
+
+        JButton btnAdd = createStyledButton("➕ Nouveau Paiement", new Color(37, 99, 235), Color.WHITE);
+        JButton btnDelete = createStyledButton("🗑️ Annuler Paiement", new Color(244, 63, 94), Color.WHITE);
+
         btnPanel.add(btnAdd);
         btnPanel.add(btnDelete);
         add(btnPanel, BorderLayout.SOUTH);
@@ -73,6 +89,40 @@ public class PayrollPanel extends JPanel {
         });
     }
 
+    private void setupTableStyle() {
+        table.setRowHeight(35);
+        table.setSelectionBackground(new Color(239, 246, 255));
+        table.setGridColor(new Color(241, 245, 249));
+        table.setShowVerticalLines(false);
+        
+        table.getTableHeader().setBackground(new Color(248, 250, 252));
+        table.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 13));
+        table.getTableHeader().setPreferredSize(new Dimension(0, 40));
+
+        // Styling l-colonne dial l-khlass NET (Index 7)
+        table.getColumnModel().getColumn(7).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setForeground(new Color(22, 163, 74)); // Loun khder dial l-flous
+                setFont(getFont().deriveFont(Font.BOLD));
+                return c;
+            }
+        });
+    }
+
+    private JButton createStyledButton(String text, Color bg, Color fg) {
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("SansSerif", Font.BOLD, 13));
+        btn.setBackground(bg);
+        btn.setForeground(fg);
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setPreferredSize(new Dimension(180, 40));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
+    }
+
     public void refreshTable() {
         model.setRowCount(0);
         List<Payroll> list = dao.getAllPayrolls();
@@ -85,14 +135,11 @@ public class PayrollPanel extends JPanel {
                 .findFirst().orElse("Inconnu");
 
             model.addRow(new Object[]{
-                    p.getId(),
-                    empName,
-                    p.getMonth(),
-                    p.getYear(),
-                    p.getBaseSalary(),
-                    p.getBonus(),
-                    p.getDeductions(),
-                    p.getNetSalary(),
+                    p.getId(), empName, p.getMonth(), p.getYear(),
+                    String.format("%.2f", p.getBaseSalary()), 
+                    String.format("%.2f", p.getBonus()), 
+                    String.format("%.2f", p.getDeductions()), 
+                    String.format("%.2f", p.getNetSalary()), 
                     p.getPaymentDate()
             });
         }

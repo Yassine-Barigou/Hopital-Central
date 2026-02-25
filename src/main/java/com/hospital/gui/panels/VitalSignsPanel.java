@@ -8,6 +8,8 @@ import main.java.com.hospital.model.Employees;
 import main.java.com.hospital.model.VitalSign;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
@@ -23,30 +25,49 @@ public class VitalSignsPanel extends JPanel {
 
     public VitalSignsPanel(Employees user) {
         this.currentUser = user;
-        setLayout(new BorderLayout(10, 10));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        // Style Layout
+        setLayout(new BorderLayout(20, 20));
+        setBackground(Color.WHITE);
+        setBorder(new EmptyBorder(25, 25, 25, 25));
 
+        // Header
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
+        
         JLabel title = new JLabel("🩺 Constantes Vitales");
-        title.setFont(new Font("SansSerif", Font.BOLD, 20));
-        add(title, BorderLayout.NORTH);
+        title.setFont(new Font("SansSerif", Font.BOLD, 24));
+        title.setForeground(new Color(30, 41, 59));
+        
+        JLabel subtitle = new JLabel("Suivi clinique : Température, Tension, Rythme cardiaque et Poids");
+        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        subtitle.setForeground(Color.GRAY);
+        
+        headerPanel.add(title, BorderLayout.NORTH);
+        headerPanel.add(subtitle, BorderLayout.SOUTH);
+        add(headerPanel, BorderLayout.NORTH);
 
+        // Table
         String[] cols = {"ID", "Date", "Patient", "Temp. (°C)", "Tension", "Rythme (bpm)", "Poids (kg)", "Notes", "Infirmier"};
         model = new DefaultTableModel(cols, 0) {
+            @Override
             public boolean isCellEditable(int row, int column) { return false; }
         };
+        
         table = new JTable(model);
-        table.setRowHeight(30);
-        table.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));
+        setupTableStyle();
         
         JScrollPane scroll = new JScrollPane(table);
+        scroll.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240)));
         add(scroll, BorderLayout.CENTER);
 
-        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        // Boutons
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        btnPanel.setOpaque(false);
         
         if ("Infirmier".equalsIgnoreCase(user.getRole()) || "Admin".equalsIgnoreCase(user.getRole())) {
-            JButton btnAdd = new JButton("➕ Prendre Constantes");
-            JButton btnDelete = new JButton("🗑️ Supprimer");
-            btnDelete.setForeground(Color.RED);
+            JButton btnAdd = createStyledButton("➕ Prendre Constantes", new Color(37, 99, 235), Color.WHITE);
+            JButton btnDelete = createStyledButton("🗑️ Supprimer", new Color(220, 38, 38), Color.WHITE);
             
             btnPanel.add(btnAdd);
             btnPanel.add(btnDelete);
@@ -65,33 +86,54 @@ public class VitalSignsPanel extends JPanel {
                 int row = table.getSelectedRow();
                 if (row >= 0) {
                     try {
-                        // Jbid l-ID mn l-jadwal
-                        Object value = table.getValueAt(row, 0);
-                        int id = Integer.parseInt(value.toString()); 
-                        
+                        int id = Integer.parseInt(table.getValueAt(row, 0).toString()); 
                         int confirm = JOptionPane.showConfirmDialog(this, "Voulez-vous vraiment supprimer cet enregistrement ?", "Confirmer", JOptionPane.YES_NO_OPTION);
                         if (confirm == JOptionPane.YES_OPTION) {
-                            
-                            boolean success = dao.deleteVitalSign(id);
-                            
-                            if (success) {
+                            if (dao.deleteVitalSign(id)) {
                                 refreshTable();
-                            } else {
-                                JOptionPane.showMessageDialog(this, "Erreur lors de la suppression dans la base de données.", "Erreur", JOptionPane.ERROR_MESSAGE);
                             }
                         }
                     } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(this, "Erreur : Impossible de lire l'ID de la ligne.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(this, "Erreur lors de la suppression.");
                     }
                 } else {
-                    JOptionPane.showMessageDialog(this, "Veuillez sélectionner une ligne d'abord.", "Attention", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Veuillez sélectionner une ligne.");
                 }
             });
         }
         
         add(btnPanel, BorderLayout.SOUTH);
         refreshTable();
+    }
+
+    private void setupTableStyle() {
+        table.setRowHeight(35);
+        table.setSelectionBackground(new Color(239, 246, 255));
+        table.setGridColor(new Color(241, 245, 249));
+        table.setShowVerticalLines(false);
+        
+        table.getTableHeader().setBackground(new Color(248, 250, 252));
+        table.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 13));
+        table.getTableHeader().setPreferredSize(new Dimension(0, 40));
+
+        // Styling spécifique pour les colonnes numériques (Temp, Tension, Rythme)
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
+        table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
+        table.getColumnModel().getColumn(6).setCellRenderer(centerRenderer);
+    }
+
+    private JButton createStyledButton(String text, Color bg, Color fg) {
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("SansSerif", Font.BOLD, 13));
+        btn.setBackground(bg);
+        btn.setForeground(fg);
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setPreferredSize(new Dimension(190, 40));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
     }
 
     public void refreshTable() {
@@ -108,10 +150,10 @@ public class VitalSignsPanel extends JPanel {
                     vs.getId(),
                     vs.getCreatedAt(),
                     patName,
-                    vs.getTemperature(),
+                    vs.getTemperature() + " °C",
                     vs.getBloodPressure(),
-                    vs.getHeartRate(),
-                    vs.getWeight(),
+                    vs.getHeartRate() + " bpm",
+                    vs.getWeight() + " kg",
                     vs.getNotes(),
                     nurseName
             });
