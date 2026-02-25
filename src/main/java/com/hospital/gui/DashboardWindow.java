@@ -1,12 +1,19 @@
 package main.java.com.hospital.gui;
 
-import main.java.com.hospital.gui.panels.EmployeesPanel;
 import main.java.com.hospital.gui.panels.HomePanel;
-import main.java.com.hospital.gui.panels.MaintenancePanel;
+import main.java.com.hospital.gui.panels.DoctorHomePanel;
+import main.java.com.hospital.gui.panels.NurseHomePanel;   // ✨ ZEDNA L-HOME DYAL L-INFIRMIER
+import main.java.com.hospital.gui.panels.EmployeesPanel;
 import main.java.com.hospital.gui.panels.TechnicianDashboard;
 import main.java.com.hospital.gui.panels.EquipmentPanel;
+import main.java.com.hospital.gui.panels.MaintenancePanel; 
 import main.java.com.hospital.gui.panels.PatientsPanel; 
-import main.java.com.hospital.gui.panels.ConsultationsPanel; // ✨ ZEDNA CONSULTATIONS HNA
+import main.java.com.hospital.gui.panels.ConsultationsPanel;
+import main.java.com.hospital.gui.panels.AppointmentsPanel; 
+import main.java.com.hospital.gui.panels.LeavesPanel;       
+import main.java.com.hospital.gui.panels.PayrollPanel;      
+import main.java.com.hospital.gui.panels.VitalSignsPanel; 
+import main.java.com.hospital.gui.panels.TriagePanel;     
 import main.java.com.hospital.model.Employees;
 
 import javax.swing.*;
@@ -26,41 +33,59 @@ public class DashboardWindow extends JFrame {
             return;
         }
 
-        setTitle("Dashboard Hospitalier - " + user.getFirstName() + " (" + user.getRole() + ")");
+        setTitle("Dashboard Hospitalier - " + user.getFirstName() + " " + user.getLastName() + " (" + user.getRole() + ")");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1250, 750); // Keberna chwiya l-fenêtre bach yban l-jadwal mzyan
+        setSize(1250, 750); 
         setLocationRelativeTo(null);
 
         cardLayout = new CardLayout();
         mainContentPanel = new JPanel(cardLayout);
 
-        // 1. Ajouter tous les panels au CardLayout
-        mainContentPanel.add(new HomePanel(user), "HOME");
+       
+        
+        
+        if ("Médecin".equalsIgnoreCase(user.getRole())) {
+            mainContentPanel.add(new DoctorHomePanel(user), "HOME"); 
+        } else if ("Infirmier".equalsIgnoreCase(user.getRole())) {
+            mainContentPanel.add(new NurseHomePanel(user), "HOME"); // L-Infirmier 3ndo Home dyalo
+        } else {
+            mainContentPanel.add(new HomePanel(user), "HOME"); 
+        }
+
+        // Modules RH
         mainContentPanel.add(new EmployeesPanel(), "EMPLOYES");
+        mainContentPanel.add(new LeavesPanel(), "CONGES");
+        mainContentPanel.add(new PayrollPanel(), "PAIE");
+
+        // Modules Médicaux (Médecin & Infirmier)
+        mainContentPanel.add(new PatientsPanel(), "PATIENTS"); 
+        mainContentPanel.add(new ConsultationsPanel(), "CONSULTATIONS");
+        mainContentPanel.add(new AppointmentsPanel(), "RENDEZVOUS"); 
+        mainContentPanel.add(new VitalSignsPanel(user), "CONSTANTES"); 
+        mainContentPanel.add(new TriagePanel(user), "URGENCES"); 
+        
+        // Modules Technicien
         mainContentPanel.add(new TechnicianDashboard(user), "TECHNICIEN");
         mainContentPanel.add(new EquipmentPanel(), "EQUIPEMENTS");
-        mainContentPanel.add(new PatientsPanel(), "PATIENTS");
-        mainContentPanel.add(new ConsultationsPanel(), "CONSULTATIONS");
         mainContentPanel.add(new MaintenancePanel(), "MAINTENANCE");
 
-        // 2. Ajouter la sidebar et le contenu principal
+       
         add(createSidebar(user), BorderLayout.WEST);
         add(mainContentPanel, BorderLayout.CENTER);
         
-        // 3. Affichage par défaut selon le rôle
+        
         String role = user.getRole();
         if ("Technicien".equalsIgnoreCase(role)) {
             cardLayout.show(mainContentPanel, "TECHNICIEN");
-        } else if ("Médecin".equalsIgnoreCase(role)) {
-            cardLayout.show(mainContentPanel, "PATIENTS");
         } else {
-            cardLayout.show(mainContentPanel, "HOME");
+            
+            cardLayout.show(mainContentPanel, "HOME"); 
         }
     }
 
     private JPanel createSidebar(Employees user) {
         JPanel sidebar = new JPanel(new BorderLayout());
-        sidebar.setPreferredSize(new Dimension(230, 0));
+        sidebar.setPreferredSize(new Dimension(240, 0)); 
         sidebar.setBackground(new Color(30, 41, 59));
 
         JPanel topPanel = new JPanel();
@@ -76,11 +101,9 @@ public class DashboardWindow extends JFrame {
         topPanel.add(Box.createVerticalStrut(30));
 
         boolean isTech = "Technicien".equalsIgnoreCase(user.getRole());
-        boolean isMed = "Médecin".equalsIgnoreCase(user.getRole());
-        boolean isDefault = !isTech && !isMed; 
+        boolean isHomeDefault = !isTech; 
 
-        // 1. Bouton Dashboard (Home)
-        JButton homeBtn = createSidebarButton("🏠 Dashboard", true);
+        JButton homeBtn = createSidebarButton("🏠 Dashboard", isHomeDefault);
         homeBtn.addActionListener(e -> {
             if ("Technicien".equalsIgnoreCase(user.getRole())) {
                 cardLayout.show(mainContentPanel, "TECHNICIEN");
@@ -92,11 +115,9 @@ public class DashboardWindow extends JFrame {
         topPanel.add(homeBtn);
         topPanel.add(Box.createVerticalStrut(10));
 
-        // 2. Boutons Médecin & Admin (Patients + Consultations)
-        if ("Médecin".equalsIgnoreCase(user.getRole()) || "Admin".equalsIgnoreCase(user.getRole())) {
+        if ("Médecin".equalsIgnoreCase(user.getRole()) || "Admin".equalsIgnoreCase(user.getRole()) || "Infirmier".equalsIgnoreCase(user.getRole())) {
             
-            // Bouton Patients
-            JButton patientsBtn = createSidebarButton("🩺 Patients", isMed);
+            JButton patientsBtn = createSidebarButton("🩺 Patients", false);
             patientsBtn.addActionListener(e -> {
                 cardLayout.show(mainContentPanel, "PATIENTS");
                 updateMenuStyles(patientsBtn);
@@ -104,18 +125,43 @@ public class DashboardWindow extends JFrame {
             topPanel.add(patientsBtn);
             topPanel.add(Box.createVerticalStrut(10));
 
-            // ✨ NOUVEAU: Bouton Consultations
-            JButton consBtn = createSidebarButton("📋 Consultations", false);
-            consBtn.addActionListener(e -> {
-                cardLayout.show(mainContentPanel, "CONSULTATIONS");
-                updateMenuStyles(consBtn);
+            JButton vitalBtn = createSidebarButton("📉 Constantes", false);
+            vitalBtn.addActionListener(e -> {
+                cardLayout.show(mainContentPanel, "CONSTANTES");
+                updateMenuStyles(vitalBtn);
             });
-            topPanel.add(consBtn);
+            topPanel.add(vitalBtn);
             topPanel.add(Box.createVerticalStrut(10));
+
+            JButton urgencesBtn = createSidebarButton("🚨 Urgences", false);
+            urgencesBtn.addActionListener(e -> {
+                cardLayout.show(mainContentPanel, "URGENCES");
+                updateMenuStyles(urgencesBtn);
+            });
+            topPanel.add(urgencesBtn);
+            topPanel.add(Box.createVerticalStrut(10));
+
+            if ("Médecin".equalsIgnoreCase(user.getRole()) || "Admin".equalsIgnoreCase(user.getRole())) {
+                JButton rdvBtn = createSidebarButton("📅 Rendez-vous", false);
+                rdvBtn.addActionListener(e -> {
+                    cardLayout.show(mainContentPanel, "RENDEZVOUS");
+                    updateMenuStyles(rdvBtn);
+                });
+                topPanel.add(rdvBtn);
+                topPanel.add(Box.createVerticalStrut(10));
+
+                JButton consBtn = createSidebarButton("📋 Consultations", false);
+                consBtn.addActionListener(e -> {
+                    cardLayout.show(mainContentPanel, "CONSULTATIONS");
+                    updateMenuStyles(consBtn);
+                });
+                topPanel.add(consBtn);
+                topPanel.add(Box.createVerticalStrut(10));
+            }
         }
 
-        // 3. Bouton Employés (RH & Admin)
         if ("RH".equalsIgnoreCase(user.getRole()) || "Admin".equalsIgnoreCase(user.getRole())) {
+            
             JButton empBtn = createSidebarButton("👥 Employés", false);
             empBtn.addActionListener(e -> {
                 cardLayout.show(mainContentPanel, "EMPLOYES");
@@ -123,10 +169,26 @@ public class DashboardWindow extends JFrame {
             });
             topPanel.add(empBtn);
             topPanel.add(Box.createVerticalStrut(10));
+
+            JButton congesBtn = createSidebarButton("🌴 Congés", false);
+            congesBtn.addActionListener(e -> {
+                cardLayout.show(mainContentPanel, "CONGES");
+                updateMenuStyles(congesBtn);
+            });
+            topPanel.add(congesBtn);
+            topPanel.add(Box.createVerticalStrut(10));
+
+            JButton paieBtn = createSidebarButton("💰 Paie", false);
+            paieBtn.addActionListener(e -> {
+                cardLayout.show(mainContentPanel, "PAIE");
+                updateMenuStyles(paieBtn);
+            });
+            topPanel.add(paieBtn);
+            topPanel.add(Box.createVerticalStrut(10));
         }
 
-        // 4. Bouton Équipements (Technicien & Admin)
         if ("Technicien".equalsIgnoreCase(user.getRole()) || "Admin".equalsIgnoreCase(user.getRole())) {
+            
             JButton eqButton = createSidebarButton("🔧 Équipements", false);
             eqButton.addActionListener(e -> {
                 cardLayout.show(mainContentPanel, "EQUIPEMENTS");
@@ -137,7 +199,6 @@ public class DashboardWindow extends JFrame {
 
             JButton maintButton = createSidebarButton("📈 Maintenance", false);
             maintButton.addActionListener(e -> {
-                
                 cardLayout.show(mainContentPanel, "MAINTENANCE");
                 updateMenuStyles(maintButton);
             });
@@ -147,7 +208,7 @@ public class DashboardWindow extends JFrame {
 
         sidebar.add(topPanel, BorderLayout.NORTH);
 
-        // --- SECTION BAS (Profil) ---
+       
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
         bottomPanel.setOpaque(false);
@@ -170,7 +231,7 @@ public class DashboardWindow extends JFrame {
         logoutBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         logoutBtn.addActionListener(e -> {
             new LoginWindow().setVisible(true);
-            this.dispose(); // Kat-sed l-fenêtre dyal Dashboard
+            this.dispose(); 
         });
 
         bottomPanel.add(Box.createVerticalGlue());

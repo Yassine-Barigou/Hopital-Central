@@ -12,16 +12,18 @@ public class Employees {
     private String role;
     private String department;
     private String phone;
-    private Date hireDate;  // java.sql.Date
+    private Date hireDate;  
+ 
+    private double baseSalary; 
     
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
-    // constructeurs
+   
     public Employees() {}
 
     public Employees(int id, String email, String passwordHash, String firstName, String lastName,
-                     String role, String department, String phone, Date hireDate, Timestamp createdAt, Timestamp updatedAt) {
+                     String role, String department, String phone, Date hireDate, double baseSalary, Timestamp createdAt, Timestamp updatedAt) {
         this.id = id;
         this.email = email;
         this.passwordHash = passwordHash;
@@ -31,11 +33,12 @@ public class Employees {
         this.department = department;
         this.phone = phone;
         this.hireDate = hireDate;
+        this.baseSalary = baseSalary; 
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    // setters
+
     public void setId(int id) { this.id = id; }
     public void setEmail(String email) { this.email = email; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
@@ -44,11 +47,12 @@ public class Employees {
     public void setRole(String role) { this.role = role; }
     public void setDepartment(String department) { this.department = department; }
     public void setPhone(String phone) { this.phone = phone; }
-    public void setHireDate(Date hireDate) { this.hireDate = hireDate; }  // ✅ maintenant cohérent
+    public void setHireDate(Date hireDate) { this.hireDate = hireDate; }  
+    public void setBaseSalary(double baseSalary) { this.baseSalary = baseSalary; } 
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
     public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
 
-    // getters
+ 
     public int getId() { return id; }
     public String getEmail() { return email; }
     public String getPasswordHash() { return passwordHash; }
@@ -57,11 +61,12 @@ public class Employees {
     public String getRole() { return role; }
     public String getDepartment() { return department; }
     public String getPhone() { return phone; }
-    public  Date getHireDate() { return hireDate; }
+    public Date getHireDate() { return hireDate; }
+    public double getBaseSalary() { return baseSalary; } 
     public Timestamp getCreatedAt() { return createdAt; }
     public Timestamp getUpdatedAt() { return updatedAt; }
 
-    // méthodes
+
     public String getFullName() {
         return firstName + " " + lastName;
     }
@@ -74,10 +79,5 @@ public class Employees {
     @Override
     public String toString() {
         return getFullName() + " [" + role + "]";
-    }
-
-    public void setHireDate(Object hireDate2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setHireDate'");
     }
 }

@@ -9,7 +9,6 @@ import java.util.List;
 
 public class PatientDAO {
 
-    // 1. Tjib ga3 les patients mn MySQL
     public List<Patient> getAllPatients() {
         List<Patient> patients = new ArrayList<>();
         String sql = "SELECT * FROM patients ORDER BY id DESC";
@@ -26,7 +25,6 @@ public class PatientDAO {
                 p.setDateBirth(rs.getDate("date_of_birth"));
                 p.setGende(rs.getString("gender"));
                 
-                // Gestion dyal telephone (Ila kenti derti int f model o Varchar f DB)
                 String phoneStr = rs.getString("phone");
                 if (phoneStr != null && !phoneStr.isEmpty() && phoneStr.matches("\\d+")) {
                     p.setPhone(Integer.parseInt(phoneStr));
@@ -50,7 +48,6 @@ public class PatientDAO {
         return patients;
     }
 
-    // 2. Tzid patient jdid f la base de données
     public boolean addPatient(Patient p) {
         String sql = "INSERT INTO patients (first_name, last_name, date_of_birth, gender, phone, email, address, blood_type, allergies, medical_notes) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -62,7 +59,7 @@ public class PatientDAO {
             pstmt.setString(2, p.getLastName());
             pstmt.setDate(3, p.getDateBirth());
             pstmt.setString(4, p.getGende());
-            pstmt.setString(5, String.valueOf(p.getPhone())); // N7ewlo int l String l DB
+            pstmt.setString(5, String.valueOf(p.getPhone())); 
             pstmt.setString(6, p.getEmail());
             pstmt.setString(7, p.getAdress());
             pstmt.setString(8, p.getBloodType());
@@ -78,7 +75,6 @@ public class PatientDAO {
         }
     }
 
-    // 3. Modifier les informations dyal wa7ed l-patient
     public boolean updatePatient(Patient p) {
         String sql = "UPDATE patients SET first_name=?, last_name=?, date_of_birth=?, gender=?, phone=?, email=?, address=?, blood_type=?, allergies=?, medical_notes=?, updated_at=CURRENT_TIMESTAMP WHERE id=?";
 
@@ -106,7 +102,6 @@ public class PatientDAO {
         }
     }
 
-    // 4. Supprimer un patient
     public boolean deletePatient(int id) {
         String sql = "DELETE FROM patients WHERE id = ?";
         try (Connection conn = DBConnection.getConnection();

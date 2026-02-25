@@ -43,7 +43,7 @@ public class ConsultationDAO {
 
             pstmt.setInt(1, c.getPatientId());
             pstmt.setInt(2, c.getDoctorId());
-            // ✅ Fix appliqué ici
+            
             pstmt.setTimestamp(3, c.getDate());
             pstmt.setString(4, c.getReason());
             pstmt.setString(5, c.getDiagnosis());
@@ -65,7 +65,7 @@ public class ConsultationDAO {
 
             pstmt.setInt(1, c.getPatientId());
             pstmt.setInt(2, c.getDoctorId());
-            // ✅ Fix appliqué ici aussi bach ma y3tikch erreur f modification
+        
             pstmt.setTimestamp(3, new java.sql.Timestamp(c.getDate().getTime()));
             pstmt.setString(4, c.getReason());
             pstmt.setString(5, c.getDiagnosis());

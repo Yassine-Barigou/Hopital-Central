@@ -21,7 +21,6 @@ public class EquipementDAO {
 
 
                 while (res.next()){
-                    //exemple  stats.put("Fonctionnel", 3)
                     stats.put(res.getString("status"), res.getInt("total"));
                 }
 
@@ -122,7 +121,7 @@ public class EquipementDAO {
         try (Connection conn = DBConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(req)) {
             
-            stmt.setString(1, status); // On injecte 'Fonctionnel', 'En maintenance', etc.
+            stmt.setString(1, status); 
             
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -150,13 +149,11 @@ public class EquipementDAO {
 
     public List<Equipment> searchEquipements(String keyword) {
         List<Equipment> equipmentList = new ArrayList<>();
-        // On cherche le mot-clé dans le nom, le type, ou le numéro de série
         String req = "SELECT * FROM equipment WHERE name LIKE ? OR type LIKE ? OR serial_number LIKE ? ORDER BY created_at DESC";
 
         try (Connection conn = DBConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(req)) {
             
-            // Les % permettent de chercher le mot-clé n'importe où dans le texte
             String searchPattern = "%" + keyword + "%";
             stmt.setString(1, searchPattern);
             stmt.setString(2, searchPattern);
@@ -186,7 +183,6 @@ public class EquipementDAO {
         return equipmentList;
     }
     public boolean addEquipement(Equipment eq) {
-        // La requête SQL d'insertion. On utilise NOW() pour created_at
         String req = "INSERT INTO equipment (name, type, location, status, purchase_date, next_maintenance_date, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())";
         
         try (Connection conn = DBConnection.getConnection();
@@ -194,13 +190,13 @@ public class EquipementDAO {
             
             stmt.setString(1, eq.getName());
             stmt.setString(2, eq.getType());
-            stmt.setString(3, eq.getLocation()); // location = département
+            stmt.setString(3, eq.getLocation()); 
             stmt.setString(4, eq.getStatus());
             stmt.setDate(5, eq.getPurchase_date());
             stmt.setDate(6, eq.getNext_maintenance_date());
             
             int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0; // Retourne true si l'insertion a réussi
+            return rowsAffected > 0; 
             
         } catch (SQLException e) {
             System.err.println("Erreur lors de l'ajout de l'équipement : " + e.getMessage());
@@ -234,7 +230,6 @@ public class EquipementDAO {
     }
 
 
-    // 1. Compter les équipements EN RETARD (date passée)
     public int getRetardCount() {
         String req = "SELECT COUNT(*) FROM equipment WHERE next_maintenance_date < CURDATE()";
         try (Connection conn = DBConnection.getConnection();
@@ -247,7 +242,6 @@ public class EquipementDAO {
         return 0;
     }
 
-    // 2. Compter les équipements URGENTS (entre aujourd'hui et dans 7 jours)
     public int getUrgentCount() {
         String req = "SELECT COUNT(*) FROM equipment WHERE next_maintenance_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)";
         try (Connection conn = DBConnection.getConnection();
@@ -261,7 +255,6 @@ public class EquipementDAO {
     }
 
     
-    // 1. Compter les maintenances EN RETARD (date passée)
     public int countMaintenanceEnRetard() {
         String req = "SELECT COUNT(*) FROM equipment WHERE next_maintenance_date < CURDATE()";
         try (Connection conn = DBConnection.getConnection();
@@ -274,7 +267,6 @@ public class EquipementDAO {
         return 0;
     }
 
-    // < 7 jours
     public int countMaintenanceUrgente() {
         String req = "SELECT COUNT(*) FROM equipment WHERE next_maintenance_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)";
         try (Connection conn = DBConnection.getConnection();
@@ -287,7 +279,6 @@ public class EquipementDAO {
         return 0;
     }
 
-    // < 30 jours
     public int countMaintenanceAVenir() {
         String req = "SELECT COUNT(*) FROM equipment WHERE next_maintenance_date BETWEEN DATE_ADD(CURDATE(), INTERVAL 8 DAY) AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)";
         try (Connection conn = DBConnection.getConnection();
@@ -299,7 +290,6 @@ public class EquipementDAO {
         }
         return 0;
     }
-    //le tableau de maintenance (Triée par date la plus proche)
     public List<Equipment> getListePourPlanningMaintenance() {
         List<Equipment> list = new ArrayList<>();
         String req = "SELECT * FROM equipment ORDER BY next_maintenance_date ASC";

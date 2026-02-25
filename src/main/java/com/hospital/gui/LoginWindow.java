@@ -23,12 +23,12 @@ public class  LoginWindow extends JFrame{
         setSize(1000,700);
         setLocationRelativeTo(null);
 
-        //background
+       
         getContentPane().setBackground(new Color(240,244,248));
         setLayout(new GridBagLayout());
         
 
-        //hadik l3yba li kayna wsst 
+      
         JPanel card = new JPanel();
         card.setBackground(Color.WHITE);
         card.setPreferredSize(new Dimension(450,550));
@@ -44,15 +44,13 @@ public class  LoginWindow extends JFrame{
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         add(card, gbc);
-         // nbadw les componet 
-         // icone  
+         
         JPanel iconCircle = new JPanel() {
         @Override
         protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
-        // Couleur du cercle (le bleu très clair de l'image)
         g2.setColor(new Color(232, 241, 242)); 
         g2.fillOval(0, 0, getWidth() - 1, getHeight() - 1);
         g2.dispose();
@@ -60,9 +58,9 @@ public class  LoginWindow extends JFrame{
         };
 
        
-iconCircle.setLayout(new GridBagLayout()); // Pour centrer l'icône parfaitement
+iconCircle.setLayout(new GridBagLayout()); 
 iconCircle.setPreferredSize(new Dimension(100, 100));
-iconCircle.setMaximumSize(new Dimension(100, 100)); // Important pour BoxLayout
+iconCircle.setMaximumSize(new Dimension(100, 100)); // 
 
 iconCircle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -74,23 +72,19 @@ iconCircle.add(iconLabel);
 
 card.add(iconCircle);
 
-// 3iwd mn dir boarder hadi khdma m3a l3yba dyal position vertival deja fait pour que  pas repeter a chaque fois hadak border
 card.add(Box.createRigidArea(new Dimension(0, 20)));
 
-//titre details
 JLabel titleLabel = new JLabel("Hôpital Central"); 
 titleLabel.setFont(new Font("SansSerif", Font.BOLD, 28));
 titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 card.add(titleLabel);
 card.add(Box.createRigidArea(new Dimension(0, 5)));
 
-// sous titre
 JLabel subTitleLabel = new JLabel("Connectez-vous à votre espace de gestion");
 subTitleLabel.setForeground(Color.GRAY);
 subTitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 card.add(subTitleLabel);
 card.add(Box.createRigidArea(new Dimension(0, 40)));
-// email
 
 JPanel emailGroup = new JPanel();
 emailGroup.setLayout(new BoxLayout(emailGroup, BoxLayout.Y_AXIS));
@@ -104,7 +98,6 @@ emailGroup.add(emailLabel);
 
 emailGroup.add(Box.createRigidArea(new Dimension(0, 8))); 
 
-// Ajout du Champ dans le groupe
 emailField = new JTextField();
 styleField(emailField);
 emailField.setAlignmentX(Component.LEFT_ALIGNMENT); 
@@ -113,7 +106,6 @@ emailGroup.add(emailField);
 card.add(emailGroup); 
 card.add(Box.createRigidArea(new Dimension(0, 20)));
 
-// password
 JPanel passwordGroup = new JPanel();
 passwordGroup.setLayout(new BoxLayout(passwordGroup, BoxLayout.Y_AXIS));
 passwordGroup.setOpaque(false);
@@ -138,7 +130,6 @@ card.add(passwordGroup);
 
 card.add(Box.createRigidArea(new Dimension(0, 30)));
 
-//button 
 
 JPanel buttonGroup = new JPanel();
 buttonGroup.setLayout(new BoxLayout(buttonGroup, BoxLayout.Y_AXIS));
@@ -163,12 +154,11 @@ loginButton.addActionListener(e -> {
     if (user != null) {
         String role = user.getRole(); 
         
-        // 1. Redirection vers la fenêtre principale (DashboardWindow)
-        // On passe l'objet 'user' à la fenêtre pour qu'elle sache qui est connecté
+      
         DashboardWindow dashboard = new DashboardWindow(user); 
         dashboard.setVisible(true); 
         
-        this.dispose(); // Ferme le login
+        this.dispose();
     } else {
         JOptionPane.showMessageDialog(this, "Email ou mot de passe incorrect", "Erreur", JOptionPane.ERROR_MESSAGE);
     }
@@ -179,7 +169,7 @@ loginButton.addActionListener(e -> {
 
         
     }
-    //HHH
+
 
 private JLabel createLabel(String text) {
     JLabel label = new JLabel(text);
@@ -193,12 +183,10 @@ private void styleField(JTextField field) {
     field.setFont(new Font("Segoe UI", Font.PLAIN, 15));
     field.setBackground(Color.WHITE);
     
-    // On force la largeur pour qu'il remplisse le emailGroup
     field.setPreferredSize(new Dimension(350, 45));
     field.setMaximumSize(new Dimension(350, 45));
 }
 
-    // --- Classe pour la bordure arrondie ---
     class RoundedBorder extends javax.swing.border.AbstractBorder {
         private Color color;
         private int radius;
@@ -209,7 +197,7 @@ private void styleField(JTextField field) {
         }
         @Override
         public Insets getBorderInsets(Component c) {
-        // top, left, bottom, right
+      
         return new Insets(8, 15, 8, 15); 
         }
 
@@ -231,7 +219,7 @@ private void styleField(JTextField field) {
 }
 private void styleButton(JButton button) {
     Color originalColor = new Color(0, 102, 110);
-    Color hoverColor = new Color(0, 125, 135); // Un bleu un peu plus clair pour le hover
+    Color hoverColor = new Color(0, 125, 135);
 
     button.setBackground(originalColor);
     button.setForeground(Color.WHITE);
@@ -243,16 +231,16 @@ private void styleButton(JButton button) {
     button.setPreferredSize(new Dimension(350, 50));
     button.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-    // --- AJOUT DE L'EFFET HOVER ---
+
     button.addMouseListener(new java.awt.event.MouseAdapter() {
         @Override
         public void mouseEntered(java.awt.event.MouseEvent evt) {
-            button.setBackground(hoverColor); // Change vers la couleur claire
+            button.setBackground(hoverColor); 
         }
 
         @Override
         public void mouseExited(java.awt.event.MouseEvent evt) {
-            button.setBackground(originalColor); // Revient à la couleur d'origine
+            button.setBackground(originalColor);
         }
     });
 
@@ -263,7 +251,6 @@ private void styleButton(JButton button) {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             
-            // Cette ligne va maintenant utiliser la couleur modifiée par le MouseListener
             g2.setColor(c.getBackground()); 
             
             g2.fillRoundRect(0, 0, c.getWidth(), c.getHeight(), 15, 15);

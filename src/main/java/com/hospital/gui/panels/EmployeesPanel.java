@@ -46,7 +46,7 @@ public class EmployeesPanel extends JPanel {
 
         refreshTable();
 
-        // Ajouter
+        
         btnAdd.addActionListener(e -> {
             Employees emp = new Employees();
             EmployeeFormDialog dialog = new EmployeeFormDialog(emp);
@@ -57,7 +57,6 @@ public class EmployeesPanel extends JPanel {
             }
         });
 
-        // Modifier
         btnEdit.addActionListener(e -> {
             int row = table.getSelectedRow();
             if (row >= 0) {
@@ -76,7 +75,6 @@ public class EmployeesPanel extends JPanel {
             }
         });
 
-        // Supprimer
         btnDelete.addActionListener(e -> {
             int row = table.getSelectedRow();
             if (row >= 0) {

@@ -1,13 +1,13 @@
 package main.java.com.hospital.model;
 
-import java.sql.Timestamp; // ✅ L-FIX HOWA HADA: sta3melna dyal SQL machi dyal security
+import java.sql.Timestamp; 
 import java.text.SimpleDateFormat;
 
 public class Consultation {
     private int id;
     private int patientId;
     private int doctorId;
-    private Timestamp date; // Daba Java 3arefha java.sql.Timestamp
+    private Timestamp date; 
     private String reason;
     private String diagnosis;
     private String prescription;
@@ -33,7 +33,6 @@ public class Consultation {
         this.updatedAt = updatedAt;
     }
 
-    // --- Getters ---
     public int getId() { return id; }
     public int getPatientId() { return patientId; }
     public int getDoctorId() { return doctorId; }
@@ -46,7 +45,6 @@ public class Consultation {
     public Timestamp getCreatedAt() { return createdAt; }
     public Timestamp getUpdatedAt() { return updatedAt; }
 
-    // --- Setters ---
     public void setId(int id) { this.id = id; }
     public void setPatientId(int patientId) { this.patientId = patientId; }
     public void setDoctorId(int doctorId) { this.doctorId = doctorId; }
@@ -59,7 +57,6 @@ public class Consultation {
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
     public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
 
-    // --- Méthodes utilitaires ---
     public String getFormattedDate() {
         if (date == null) return "";
         return new SimpleDateFormat("dd/MM/yyyy HH:mm").format(date);
@@ -74,7 +71,6 @@ public class Consultation {
         return "Diag: " + (diagnosis.length() > 20 ? diagnosis.substring(0, 20) + "..." : diagnosis);
     }
 
-    // Fikra zwina hadi! Tqder tnfa3na f l'impression dyal l'ordonnance mn b3d
     public String getPrintableFormat() {
         return "ORDONNANCE MÉDICALE\n" +
                "Date : " + getFormattedDate() + "\n" +

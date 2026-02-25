@@ -90,11 +90,11 @@ public class EmployeeFormDialog extends JDialog {
             employee.setFirstName(tfFirstName.getText().trim());
             employee.setLastName(tfLastName.getText().trim());
             employee.setEmail(tfEmail.getText().trim());
-            employee.setPasswordHash(new String(pfPassword.getPassword())); // ⚡ mot de passe
+            employee.setPasswordHash(new String(pfPassword.getPassword()));
             employee.setRole(tfRole.getText().trim());
             employee.setDepartment(tfDepartment.getText().trim());
             employee.setPhone(tfPhone.getText().trim());
-            employee.setHireDate(Date.valueOf(tfHireDate.getText().trim())); // java.sql.Date
+            employee.setHireDate(Date.valueOf(tfHireDate.getText().trim())); 
             return true;
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Erreur : " + ex.getMessage());

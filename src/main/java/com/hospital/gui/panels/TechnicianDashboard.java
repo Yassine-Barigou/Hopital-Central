@@ -17,12 +17,10 @@ public class  TechnicianDashboard extends JPanel{
         setLayout(new BorderLayout());
         setBackground(new Color(248, 250, 252)); // Gris très clair
         setBorder(new EmptyBorder(30, 30, 30, 30));
-        // prendre les nombres du BDD
         Map<String , Integer> stats = dao.getEquipmentStats();
         int  okCount = stats.getOrDefault("Fonctionnel", 0);
         int alertCount = stats.getOrDefault("Hors service", 0)+ stats.getOrDefault("En maintenance", 0);
         
-        //ZONE 1 : les CARDS (North)
 
         JPanel topCards = new JPanel(new GridLayout(1,2,20,0));
         topCards.setOpaque(false);
@@ -32,7 +30,6 @@ public class  TechnicianDashboard extends JPanel{
 
         add(topCards, BorderLayout.NORTH);
 
-        //zone 2
         add(createRecentActivitySection(), BorderLayout.CENTER);
 
 
@@ -89,13 +86,11 @@ public class  TechnicianDashboard extends JPanel{
             listPanel.add(new JLabel("Aucune activité récente."));
         } else {
             for (String activity : activities) {
-                // Créer une ligne pour chaque activité
                 JLabel row = new JLabel("<html><b>•</b> " + activity + "</html>");
                 row.setBorder(new EmptyBorder(10, 0, 10, 0));
                 row.setFont(new Font("SansSerif", Font.PLAIN, 14));
                 listPanel.add(row);
                 
-                // Zid wa7ed l-khet sghir (Separator)
                 listPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
             }
         }

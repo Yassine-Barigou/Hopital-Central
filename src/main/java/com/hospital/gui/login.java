@@ -48,7 +48,7 @@ public class login extends JFrame {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
-        // Couleur du cercle (le bleu très clair de l'image)
+        
                 g2.setColor(new Color(232, 241, 242)); 
                 g2.fillOval(0, 0, getWidth() - 1, getHeight() - 1);
                 g2.dispose();
@@ -92,20 +92,3 @@ public class login extends JFrame {
 }
 }
 
-/*login (extends JFrame)
-│
-├── constructor login()
-│     - إعدادات النافذة (title, size, close, location)
-│     - إعداد Layout (GridBagLayout)
-│     - إنشاء JPanel card
-│     - إنشاء المكونات (labels, fields, buttons)
-│     - ترتيب المكونات داخل card
-│     - إضافة card للنافذة
-│
-├── Methods خارج constructor
-│     - أي وظائف مساعدة (مثلاً styleButton(), styleField())
-│     - أي action listeners
-│
-└── main()
-      - إنشاء نافذة وتشغيلها
-      */

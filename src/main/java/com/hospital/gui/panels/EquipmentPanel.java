@@ -16,7 +16,6 @@ public class EquipmentPanel extends JPanel {
     private JComboBox<String> statusFilter;
     private EquipementDAO equipmentDAO;
 
-    // 1. Declare the value labels globally so we can update them later
     private JLabel totalValueLbl = new JLabel("0");
     private JLabel functionalValueLbl = new JLabel("0");
     private JLabel maintenanceValueLbl = new JLabel("0");
@@ -30,7 +29,6 @@ public class EquipmentPanel extends JPanel {
         setBackground(new Color(245, 247, 250)); 
         setBorder(new EmptyBorder(20, 20, 20, 20)); 
 
-        // --- 1. TOP HEADER ---
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false); 
         
@@ -46,7 +44,6 @@ public class EquipmentPanel extends JPanel {
         titleBox.add(Box.createRigidArea(new Dimension(0, 5)));
         titleBox.add(subtitleLabel);
 
-        // --- Création du groupe de boutons (Modifier, Supprimer, Ajouter) ---
         JPanel actionButtonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         actionButtonsPanel.setOpaque(false);
 
@@ -67,7 +64,6 @@ public class EquipmentPanel extends JPanel {
         addBtn.setFocusPainted(false);
         addBtn.setFont(new Font("SansSerif", Font.BOLD, 14));
 
-        // Actions des boutons
         addBtn.addActionListener(e -> showAddEquipmentDialog());
 
         editBtn.addActionListener(e -> {
@@ -87,7 +83,7 @@ public class EquipmentPanel extends JPanel {
             }
 
             int modelRow = equipmentTable.convertRowIndexToModel(selectedRow);
-            int id = (int) tableModel.getValueAt(modelRow, 0); // L'ID caché
+            int id = (int) tableModel.getValueAt(modelRow, 0); 
             String equipName = String.valueOf(tableModel.getValueAt(modelRow, 1));
 
             int confirm = JOptionPane.showConfirmDialog(this, 
@@ -104,7 +100,6 @@ public class EquipmentPanel extends JPanel {
             }
         });
 
-        // Ajout au panel
         actionButtonsPanel.add(editBtn);
         actionButtonsPanel.add(deleteBtn);
         actionButtonsPanel.add(addBtn);
@@ -112,12 +107,10 @@ public class EquipmentPanel extends JPanel {
         headerPanel.add(titleBox, BorderLayout.WEST);
         headerPanel.add(actionButtonsPanel, BorderLayout.EAST);
 
-        // --- 2. STATISTIC CARDS (Tickets) ---
         JPanel cardsPanel = new JPanel(new GridLayout(1, 4, 15, 0)); 
         cardsPanel.setOpaque(false);
         cardsPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120)); 
 
-        // 2. Pass the global labels into our helper method
         JPanel totalCard = createStatCard("Total", totalValueLbl, Color.DARK_GRAY);
         JPanel functionalCard = createStatCard("Fonctionnels", functionalValueLbl, new Color(34, 139, 34)); 
         JPanel maintenanceCard = createStatCard("En maintenance", maintenanceValueLbl, new Color(218, 165, 32)); 
@@ -128,7 +121,6 @@ public class EquipmentPanel extends JPanel {
         cardsPanel.add(maintenanceCard);
         cardsPanel.add(brokenCard);
 
-        // --- 3. TABLE SECTION ---
         JPanel tableContainer = new JPanel(new BorderLayout(0, 15));
         tableContainer.setBackground(Color.WHITE);
         tableContainer.setBorder(BorderFactory.createCompoundBorder(
@@ -158,7 +150,7 @@ public class EquipmentPanel extends JPanel {
             @Override
             public void keyReleased(java.awt.event.KeyEvent e) {
                 String keyword = searchField.getText().trim();
-                tableModel.setRowCount(0); // Vider le tableau visuel
+                tableModel.setRowCount(0); 
                 
                 List<Equipment> searchedList;
                 
@@ -191,26 +183,24 @@ public class EquipmentPanel extends JPanel {
         statusFilter = new JComboBox<>(statuses);
         statusFilter.setPreferredSize(new Dimension(150, 30));
         statusFilter.addActionListener(e -> {
-            // 1. Récupérer le choix de l'utilisateur
+          
             String selectedStatus = (String) statusFilter.getSelectedItem();
             
-            // 2. Vider complètement les lignes actuelles du tableau
+            
             tableModel.setRowCount(0);
             
-            // 3. Préparer une liste vide
+           
             List<Equipment> filteredList;
             
-            // 4. Interroger la BDD selon le choix
             if ("Tous les statuts".equals(selectedStatus)) {
-                filteredList = equipmentDAO.getAllEquipements(); // On prend tout
+                filteredList = equipmentDAO.getAllEquipements(); 
             } else {
-                filteredList = equipmentDAO.getEquipementsByStatus(selectedStatus); // On filtre en BDD
+                filteredList = equipmentDAO.getEquipementsByStatus(selectedStatus); 
             }
             
-            // 5. Remplir le tableau avec la nouvelle liste récupérée de la BDD
             for (Equipment eq : filteredList) {
                 Object[] row = {
-                    eq.getId(), // Toujours garder l'ID caché en première colonne
+                    eq.getId(), 
                     eq.getName(),
                     eq.getType(),
                     eq.getLocation(),
@@ -250,20 +240,19 @@ public class EquipmentPanel extends JPanel {
         tableContainer.add(tableHeaderPanel, BorderLayout.NORTH);
         tableContainer.add(tableScrollPane, BorderLayout.CENTER);
 
-        // --- 4. ASSEMBLE EVERYTHING ---
+      
         add(headerPanel);
         add(Box.createRigidArea(new Dimension(0, 20)));
         add(cardsPanel);
         add(Box.createRigidArea(new Dimension(0, 25)));
         add(tableContainer);
 
-        // 3. Load initial table data AND statistics
+        
         refreshAllData();
     }
 
-    /**
-     * Helper method updated to accept an existing JLabel
-     */
+    
+    
     private JPanel createStatCard(String title, JLabel valueLbl, Color valueColor) {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
@@ -289,9 +278,7 @@ public class EquipmentPanel extends JPanel {
         return card;
     }
 
-    /**
-     * Call this whenever data is added, edited, or deleted
-     */
+    
     public void refreshAllData() {
         refreshTableData();
         refreshStatistics();
@@ -316,26 +303,24 @@ public class EquipmentPanel extends JPanel {
     }
 
     private void showAddEquipmentDialog() {
-        // 1. Setup the Dialog
+      
         Window parentWindow = SwingUtilities.getWindowAncestor(this);
         JDialog dialog = new JDialog(parentWindow, "Ajouter un équipement", Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setSize(500, 450);
         dialog.setLocationRelativeTo(parentWindow);
         dialog.setLayout(new BorderLayout());
 
-        // 2. Build the Form Panel
+      
         JPanel formPanel = new JPanel();
         formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Name
         formPanel.add(new JLabel("Nom de l'équipement *"));
         JTextField nameField = new JTextField();
         nameField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
         formPanel.add(nameField);
         formPanel.add(Box.createVerticalStrut(15));
 
-        // Type & Department (Row 2)
         JPanel row2 = new JPanel(new GridLayout(1, 2, 15, 0));
         
         JPanel typePanel = new JPanel();
@@ -356,14 +341,12 @@ public class EquipmentPanel extends JPanel {
         formPanel.add(row2);
         formPanel.add(Box.createVerticalStrut(15));
 
-        // Status
         formPanel.add(new JLabel("Status *"));
         JComboBox<String> statusCombo = new JComboBox<>(new String[]{"Fonctionnel", "En maintenance", "Hors service"});
         statusCombo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
         formPanel.add(statusCombo);
         formPanel.add(Box.createVerticalStrut(15));
 
-        // Dates (Row 4)
         JPanel row4 = new JPanel(new GridLayout(1, 2, 15, 0));
         
         JPanel purchasePanel = new JPanel();
@@ -385,7 +368,6 @@ public class EquipmentPanel extends JPanel {
 
         dialog.add(formPanel, BorderLayout.CENTER);
 
-        // 3. Build the Button Panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton cancelBtn = new JButton("Annuler");
         JButton confirmAddBtn = new JButton("Ajouter");
@@ -394,7 +376,6 @@ public class EquipmentPanel extends JPanel {
 
         cancelBtn.addActionListener(e -> dialog.dispose());
 
-        // 4. Handle Validation and Database Insertion
         confirmAddBtn.addActionListener(e -> {
             String name = nameField.getText().trim();
             String type = (String) typeCombo.getSelectedItem();
@@ -403,19 +384,16 @@ public class EquipmentPanel extends JPanel {
             String purchaseStr = purchaseDateField.getText().trim();
             String maintStr = nextMaintenanceDateField.getText().trim();
 
-            // Constraints: Check empty fields
             if (name.isEmpty() || purchaseStr.isEmpty() || maintStr.isEmpty()) {
                 JOptionPane.showMessageDialog(dialog, "Veuillez remplir tous les champs texte.", "Erreur", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // Constraints: Check dropdowns
             if ("Sélectionner".equals(type) || "Sélectionner".equals(departement)) {
                 JOptionPane.showMessageDialog(dialog, "Veuillez sélectionner un Type et un Département.", "Erreur", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // Constraints: Check Date Format
             java.sql.Date purchaseDate;
             java.sql.Date maintDate;
             try {
@@ -426,7 +404,6 @@ public class EquipmentPanel extends JPanel {
                 return;
             }
 
-            // Create Object and Insert into DB
             Equipment eq = new Equipment();
             eq.setName(name);
             eq.setType(type);
@@ -452,32 +429,25 @@ public class EquipmentPanel extends JPanel {
         dialog.setVisible(true);
     }
 
-    /**
-     * 4. Fetches real counts from the database and updates the JLabels
-     */
+   
     public void refreshStatistics() {
         int total = equipmentDAO.getTotalEquipmentCount();
         int functional = equipmentDAO.getEquipmentCountByStatus("Fonctionnel");
         int maintenance = equipmentDAO.getEquipmentCountByStatus("En maintenance");
         int broken = equipmentDAO.getEquipmentCountByStatus("Hors service");
 
-        // Update the UI labels
         totalValueLbl.setText(String.valueOf(total));
         functionalValueLbl.setText(String.valueOf(functional));
         maintenanceValueLbl.setText(String.valueOf(maintenance));
         brokenValueLbl.setText(String.valueOf(broken));
         
-        // Update the subtitle text
         subtitleLabel.setText(total + " équipements enregistrés");
     }
 
-    /**
-     * Ouvre la fenêtre pour modifier un équipement existant
-     */
+   
     private void showEditEquipmentDialog(int viewRow) {
         int modelRow = equipmentTable.convertRowIndexToModel(viewRow);
         
-        // Récupération sécurisée des données de la ligne sélectionnée
         int id = (int) tableModel.getValueAt(modelRow, 0); 
         String currentName = String.valueOf(tableModel.getValueAt(modelRow, 1));
         String currentType = String.valueOf(tableModel.getValueAt(modelRow, 2));
@@ -490,7 +460,6 @@ public class EquipmentPanel extends JPanel {
         Object maintObj = tableModel.getValueAt(modelRow, 6);
         String currentMaint = (maintObj != null) ? maintObj.toString() : "";
 
-        // Construction de la fenêtre
         Window parentWindow = SwingUtilities.getWindowAncestor(this);
         JDialog dialog = new JDialog(parentWindow, "Modifier l'équipement", Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setSize(500, 450);
@@ -501,14 +470,12 @@ public class EquipmentPanel extends JPanel {
         formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Nom
         formPanel.add(new JLabel("Nom de l'équipement *"));
         JTextField nameField = new JTextField(currentName);
         nameField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
         formPanel.add(nameField);
         formPanel.add(Box.createVerticalStrut(15));
 
-        // Type & Département 
         JPanel row2 = new JPanel(new GridLayout(1, 2, 15, 0));
         
         JPanel typePanel = new JPanel();
@@ -531,7 +498,6 @@ public class EquipmentPanel extends JPanel {
         formPanel.add(row2);
         formPanel.add(Box.createVerticalStrut(15));
 
-        // Status
         formPanel.add(new JLabel("Status *"));
         JComboBox<String> statusCombo = new JComboBox<>(new String[]{"Fonctionnel", "En maintenance", "Hors service"});
         statusCombo.setSelectedItem(currentStatus);
@@ -539,7 +505,6 @@ public class EquipmentPanel extends JPanel {
         formPanel.add(statusCombo);
         formPanel.add(Box.createVerticalStrut(15));
 
-        // Dates 
         JPanel row4 = new JPanel(new GridLayout(1, 2, 15, 0));
         
         JPanel purchasePanel = new JPanel();
@@ -561,7 +526,6 @@ public class EquipmentPanel extends JPanel {
 
         dialog.add(formPanel, BorderLayout.CENTER);
 
-        // Boutons du bas
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton cancelBtn = new JButton("Annuler");
         JButton saveBtn = new JButton("Enregistrer");
@@ -594,7 +558,7 @@ public class EquipmentPanel extends JPanel {
             }
 
             Equipment eq = new Equipment();
-            eq.setId(id); // L'ID pour modifier la bonne ligne
+            eq.setId(id); 
             eq.setName(name);
             eq.setType(type);
             eq.setLocation(departement); 

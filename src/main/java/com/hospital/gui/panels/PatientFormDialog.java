@@ -11,7 +11,6 @@ public class PatientFormDialog extends JDialog {
     private boolean saved = false;
     private Patient patient;
 
-    // Les champs du formulaire
     private JTextField txtFirstName;
     private JTextField txtLastName;
     private JTextField txtDateBirth; // Format YYYY-MM-DD
@@ -26,18 +25,15 @@ public class PatientFormDialog extends JDialog {
     public PatientFormDialog(Patient p) {
         this.patient = p;
         
-        // Configuration de la fenêtre Pop-up
         setTitle(p.getId() == 0 ? "Ajouter un Patient" : "Modifier le Patient");
         setModal(true); // Bach t-bloquer l-fenêtre li wraha
         setSize(450, 550);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // --- PANEL DU FORMULAIRE ---
         JPanel formPanel = new JPanel(new GridLayout(10, 2, 10, 10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Initialisation des champs
         txtFirstName = new JTextField();
         txtLastName = new JTextField();
         txtDateBirth = new JTextField();
@@ -52,7 +48,6 @@ public class PatientFormDialog extends JDialog {
         txtAllergies = new JTextArea(2, 20);
         txtMedicalNotes = new JTextArea(2, 20);
 
-        // Ajout au formPanel
         formPanel.add(new JLabel("Prénom : *"));
         formPanel.add(txtFirstName);
         
@@ -85,7 +80,6 @@ public class PatientFormDialog extends JDialog {
 
         add(formPanel, BorderLayout.CENTER);
 
-        // --- PANEL DES BOUTONS ---
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnSave = new JButton("Enregistrer");
         JButton btnCancel = new JButton("Annuler");
@@ -94,7 +88,6 @@ public class PatientFormDialog extends JDialog {
         btnPanel.add(btnCancel);
         add(btnPanel, BorderLayout.SOUTH);
 
-        // --- REMPLIR LES CHAMPS SI C'EST UNE MODIFICATION ---
         if (p.getId() != 0) {
             txtFirstName.setText(p.getFirstName());
             txtLastName.setText(p.getLastName());
@@ -108,30 +101,25 @@ public class PatientFormDialog extends JDialog {
             txtMedicalNotes.setText(p.getMedicalNotes());
         }
 
-        // --- ACTIONS DES BOUTONS ---
         btnCancel.addActionListener(e -> dispose());
 
         btnSave.addActionListener(e -> savePatient());
     }
 
     private void savePatient() {
-        // 1. Vérification dyal les champs obligatoires
         if (txtFirstName.getText().trim().isEmpty() || txtLastName.getText().trim().isEmpty() || txtDateBirth.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Veuillez remplir les champs obligatoires (*).", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try {
-            // 2. Récupérer et convertir les valeurs
             patient.setFirstName(txtFirstName.getText().trim());
             patient.setLastName(txtLastName.getText().trim());
             
-            // Convertir String to java.sql.Date
             patient.setDateBirth(Date.valueOf(txtDateBirth.getText().trim())); 
             
             patient.setGende(cbGender.getSelectedItem().toString());
             
-            // Convertir String to int (Téléphone)
             String phoneStr = txtPhone.getText().trim();
             if(!phoneStr.isEmpty()) {
                 patient.setPhone(Integer.parseInt(phoneStr));
@@ -145,7 +133,6 @@ public class PatientFormDialog extends JDialog {
             patient.setAllergies(txtAllergies.getText().trim());
             patient.setMedicalNotes(txtMedicalNotes.getText().trim());
 
-            // 3. Valider o nseddo l-fenêtre
             saved = true;
             dispose();
 
@@ -154,7 +141,6 @@ public class PatientFormDialog extends JDialog {
         }
     }
 
-    // Méthode li kat 3lem l-Panel wach cliquina 3la Save wla Cancel
     public boolean isSaved() {
         return saved;
     }

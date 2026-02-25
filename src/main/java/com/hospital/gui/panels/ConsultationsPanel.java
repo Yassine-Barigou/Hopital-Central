@@ -24,12 +24,10 @@ public class ConsultationsPanel extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // --- Titre ---
         JLabel title = new JLabel("🩺 Gestion des Consultations");
         title.setFont(new Font("SansSerif", Font.BOLD, 20));
         add(title, BorderLayout.NORTH);
 
-        // --- Table ---
         String[] cols = {"ID", "Patient", "Médecin", "Date & Heure", "Motif", "Statut"};
         model = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int row, int column) { return false; }
@@ -41,7 +39,6 @@ public class ConsultationsPanel extends JPanel {
         JScrollPane scroll = new JScrollPane(table);
         add(scroll, BorderLayout.CENTER);
 
-        // --- Boutons ---
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnAdd = new JButton("➕ Ajouter");
         JButton btnEdit = new JButton("✏️ Modifier");
@@ -53,12 +50,9 @@ public class ConsultationsPanel extends JPanel {
         btnPanel.add(btnDelete);
         add(btnPanel, BorderLayout.SOUTH);
 
-        // Charger les données
         refreshTable();
 
-        // --- ACTIONS ---
 
-        // Ajouter
         btnAdd.addActionListener(e -> {
             Consultation c = new Consultation();
             ConsultationFormDialog dialog = new ConsultationFormDialog(c);
@@ -69,7 +63,6 @@ public class ConsultationsPanel extends JPanel {
             }
         });
 
-        // Modifier
         btnEdit.addActionListener(e -> {
             int row = table.getSelectedRow();
             if (row >= 0) {
@@ -88,7 +81,6 @@ public class ConsultationsPanel extends JPanel {
             }
         });
 
-        // Supprimer
         btnDelete.addActionListener(e -> {
             int row = table.getSelectedRow();
             if (row >= 0) {
@@ -111,13 +103,11 @@ public class ConsultationsPanel extends JPanel {
         List<Employees> employees = empDAO.getAllEmployees();
 
         for (Consultation c : list) {
-            // Récupérer le nom du patient (au lieu d'afficher juste l'ID)
             String patientName = patients.stream()
                 .filter(p -> p.getId() == c.getPatientId())
                 .map(p -> p.getFirstName() + " " + p.getLastName())
                 .findFirst().orElse("Patient Inconnu");
                                 
-            // Récupérer le nom du médecin
             String doctorName = employees.stream()
                 .filter(e -> e.getId() == c.getDoctorId())
                 .map(e -> "Dr. " + e.getFirstName() + " " + e.getLastName())
@@ -127,7 +117,7 @@ public class ConsultationsPanel extends JPanel {
                     c.getId(),
                     patientName,
                     doctorName,
-                    c.getFormattedDate(), // Kanhdmou b l-methode li 9aditi f l-Model
+                    c.getFormattedDate(), 
                     c.getReason(),
                     c.getStatus()
             });

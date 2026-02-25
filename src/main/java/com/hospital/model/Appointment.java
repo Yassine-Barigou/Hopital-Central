@@ -26,7 +26,6 @@ public class Appointment {
         this.notes = notes;
     }
 
-    // Getters
     public int getId() { return id; }
     public int getPatientId() { return patientId; }
     public int getDoctorId() { return doctorId; }
@@ -36,7 +35,6 @@ public class Appointment {
     public String getStatus() { return status; }
     public String getNotes() { return notes; }
 
-    // Setters
     public void setId(int id) { this.id = id; }
     public void setPatientId(int patientId) { this.patientId = patientId; }
     public void setDoctorId(int doctorId) { this.doctorId = doctorId; }
@@ -46,7 +44,6 @@ public class Appointment {
     public void setStatus(String status) { this.status = status; }
     public void setNotes(String notes) { this.notes = notes; }
 
-    // Utilitaires
     public String getFormattedDate() {
         if (date == null) return "";
         return new SimpleDateFormat("dd/MM/yyyy HH:mm").format(date);

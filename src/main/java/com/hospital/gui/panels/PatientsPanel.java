@@ -18,12 +18,11 @@ public class PatientsPanel extends JPanel {
         
         setLayout(new BorderLayout(10, 10));
         
-        // Titre
+        
         JLabel title = new JLabel("🩺 Gestion des Patients");
         title.setFont(new Font("SansSerif", Font.BOLD, 18));
         add(title, BorderLayout.NORTH);
 
-        // Table
         String[] cols = {"ID", "Prénom", "Nom", "Date de Naissance", "Sexe", "Téléphone", "Groupe Sanguin"};
         model = new DefaultTableModel(cols, 0) {
             public boolean isCellEditable(int row, int column) { return false; }
@@ -32,7 +31,6 @@ public class PatientsPanel extends JPanel {
         JScrollPane scroll = new JScrollPane(table);
         add(scroll, BorderLayout.CENTER);
 
-        // Boutons
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnAdd = new JButton("Ajouter");
         JButton btnEdit = new JButton("Modifier");
@@ -42,12 +40,9 @@ public class PatientsPanel extends JPanel {
         btnPanel.add(btnDelete);
         add(btnPanel, BorderLayout.SOUTH);
 
-        // Charger les données
         refreshTable();
 
-        // --- ACTIONS DES BOUTONS ---
-
-        // Ajouter
+     
         btnAdd.addActionListener(e -> {
             Patient p = new Patient();
             PatientFormDialog dialog = new PatientFormDialog(p);
@@ -58,7 +53,6 @@ public class PatientsPanel extends JPanel {
             }
         });
 
-        // Modifier
         btnEdit.addActionListener(e -> {
             int row = table.getSelectedRow();
             if (row >= 0) {
@@ -79,7 +73,6 @@ public class PatientsPanel extends JPanel {
             }
         });
 
-        // Supprimer
         btnDelete.addActionListener(e -> {
             int row = table.getSelectedRow();
             if (row >= 0) {
@@ -95,7 +88,6 @@ public class PatientsPanel extends JPanel {
         });
     }
 
-    // Méthode pour rafraîchir le tableau
     public void refreshTable() {
         model.setRowCount(0);
         List<Patient> list = dao.getAllPatients();

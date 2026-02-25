@@ -9,7 +9,7 @@ import java.util.List;
 
 public class EmployeesDAO {
 
-    // Vérifier login
+ 
     public Employees checkLogin(String email, String password) {
         String sql = "SELECT * FROM employees WHERE email=? AND password_hash=?";
         try (Connection conn = DBConnection.getConnection();
@@ -29,6 +29,7 @@ public class EmployeesDAO {
                     user.setDepartment(rs.getString("department"));
                     user.setPhone(rs.getString("phone"));
                     user.setHireDate(rs.getDate("hire_date"));
+                    user.setBaseSalary(rs.getDouble("base_salary")); // ✨ ZEDNAHA HNA
                     user.setPasswordHash(rs.getString("password_hash"));
                     return user;
                 }
@@ -39,7 +40,6 @@ public class EmployeesDAO {
         return null;
     }
 
-    // Lister tous les employés
     public List<Employees> getAllEmployees() {
         List<Employees> list = new ArrayList<>();
         String sql = "SELECT * FROM employees ORDER BY id";
@@ -57,6 +57,7 @@ public class EmployeesDAO {
                 e.setDepartment(rs.getString("department"));
                 e.setPhone(rs.getString("phone"));
                 e.setHireDate(rs.getDate("hire_date"));
+                e.setBaseSalary(rs.getDouble("base_salary")); // ✨ ZEDNAHA HNA
                 e.setPasswordHash(rs.getString("password_hash"));
                 list.add(e);
             }
@@ -67,9 +68,8 @@ public class EmployeesDAO {
         return list;
     }
 
-    // Ajouter un employé
     public void addEmployee(Employees e) {
-        String sql = "INSERT INTO employees (email, password_hash, first_name, last_name, role, department, phone, hire_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO employees (email, password_hash, first_name, last_name, role, department, phone, hire_date, base_salary) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -81,6 +81,7 @@ public class EmployeesDAO {
             stmt.setString(6, e.getDepartment());
             stmt.setString(7, e.getPhone());
             stmt.setDate(8, e.getHireDate());
+            stmt.setDouble(9, e.getBaseSalary()); // ✨ ZEDNAHA HNA
 
             stmt.executeUpdate();
 
@@ -95,9 +96,8 @@ public class EmployeesDAO {
         }
     }
 
-    // Modifier un employé
     public void updateEmployee(Employees e) {
-        String sql = "UPDATE employees SET email=?, password_hash=?, first_name=?, last_name=?, role=?, department=?, phone=?, hire_date=? WHERE id=?";
+        String sql = "UPDATE employees SET email=?, password_hash=?, first_name=?, last_name=?, role=?, department=?, phone=?, hire_date=?, base_salary=? WHERE id=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -109,7 +109,8 @@ public class EmployeesDAO {
             stmt.setString(6, e.getDepartment());
             stmt.setString(7, e.getPhone());
             stmt.setDate(8, e.getHireDate());
-            stmt.setInt(9, e.getId());
+            stmt.setDouble(9, e.getBaseSalary()); // ✨ ZEDNAHA HNA
+            stmt.setInt(10, e.getId());
 
             stmt.executeUpdate();
 
@@ -118,7 +119,6 @@ public class EmployeesDAO {
         }
     }
 
-    // Supprimer un employé
     public void deleteEmployee(int id) {
         String sql = "DELETE FROM employees WHERE id=?";
         try (Connection conn = DBConnection.getConnection();

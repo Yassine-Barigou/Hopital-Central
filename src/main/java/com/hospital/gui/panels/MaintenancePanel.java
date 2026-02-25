@@ -17,7 +17,7 @@ public class MaintenancePanel extends JPanel {
     private JTable maintenanceTable;
     private EquipementDAO equipmentDAO;
 
-    // Labels pour les compteurs dynamiques en haut
+    
     private JLabel retardValueLbl;
     private JLabel urgentValueLbl;
     private JLabel avenirValueLbl;
@@ -25,12 +25,10 @@ public class MaintenancePanel extends JPanel {
     public MaintenancePanel() {
         this.equipmentDAO = new EquipementDAO();
 
-        // Layout principal
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBackground(new Color(245, 247, 250)); // Fond gris clair
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        // --- 1. HEADER (Titre) ---
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
         
@@ -48,17 +46,14 @@ public class MaintenancePanel extends JPanel {
         titleBox.add(subtitleLabel);
         headerPanel.add(titleBox, BorderLayout.WEST);
 
-        // --- 2. CARTES STATISTIQUES (En retard, Urgent, À venir) ---
         JPanel cardsPanel = new JPanel(new GridLayout(1, 3, 20, 0)); // 3 colonnes espacées
         cardsPanel.setOpaque(false);
         cardsPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
 
-        // Initialisation des labels
         retardValueLbl = new JLabel("0");
         urgentValueLbl = new JLabel("0");
         avenirValueLbl = new JLabel("0");
 
-        // Création des 3 cartes avec leurs couleurs spécifiques
         JPanel retardCard = createMaintenanceCard("En retard", retardValueLbl, new Color(220, 20, 60), "❌");
         JPanel urgentCard = createMaintenanceCard("Urgent (< 7 jours)", urgentValueLbl, new Color(218, 165, 32), "⚠️");
         JPanel avenirCard = createMaintenanceCard("À venir (< 30 jours)", avenirValueLbl, new Color(65, 105, 225), "🕒");
@@ -67,7 +62,6 @@ public class MaintenancePanel extends JPanel {
         cardsPanel.add(urgentCard);
         cardsPanel.add(avenirCard);
 
-        // --- 3. TABLEAU DES MAINTENANCES ---
         JPanel tableContainer = new JPanel(new BorderLayout(0, 15));
         tableContainer.setBackground(Color.WHITE);
         tableContainer.setBorder(BorderFactory.createCompoundBorder(
@@ -75,7 +69,6 @@ public class MaintenancePanel extends JPanel {
             new EmptyBorder(15, 15, 15, 15)
         ));
 
-        // En-tête du tableau
         JPanel tableHeaderPanel = new JPanel();
         tableHeaderPanel.setLayout(new BoxLayout(tableHeaderPanel, BoxLayout.Y_AXIS));
         tableHeaderPanel.setOpaque(false);
@@ -87,7 +80,6 @@ public class MaintenancePanel extends JPanel {
         tableHeaderPanel.add(tableSubtitle);
         tableHeaderPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // Configuration du tableau
         String[] columnNames = {"Équipement", "Département", "Status actuel", "Date de maintenance", "Délai", "Priorité"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
@@ -104,16 +96,13 @@ public class MaintenancePanel extends JPanel {
         tableContainer.add(tableHeaderPanel, BorderLayout.NORTH);
         tableContainer.add(tableScrollPane, BorderLayout.CENTER);
 
-        // --- ASSEMBLAGE ---
         add(headerPanel);
         add(Box.createRigidArea(new Dimension(0, 20)));
         add(cardsPanel);
         add(Box.createRigidArea(new Dimension(0, 25)));
         add(tableContainer);
 
-        // --- 4. CHARGEMENT DES DONNÉES ---
         refreshMaintenanceData();
-        //refresh a chaque fois qu on affiche maintance pannel
         this.addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentShown(java.awt.event.ComponentEvent e) {
@@ -123,15 +112,12 @@ public class MaintenancePanel extends JPanel {
         });
     }
 
-    /**
-     * Méthode utilitaire pour créer les cartes colorées avec bordures adaptées
-     */
+    
     private JPanel createMaintenanceCard(String title, JLabel valueLbl, Color themeColor, String icon) {
         JPanel card = new JPanel();
         card.setLayout(new BorderLayout());
         card.setBackground(Color.WHITE);
         
-        // Bordure colorée si c'est "En retard" (rouge), sinon bordure grise standard
         if (title.contains("retard")) {
             card.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(themeColor, 1, true),
@@ -169,37 +155,28 @@ public class MaintenancePanel extends JPanel {
         return card;
     }
 
-    /**
-     * Interroge la base de données, calcule les délais et remplit le tableau
-     */
+   
     public void refreshMaintenanceData() {
-        // 1. Mettre à jour les compteurs en haut via le DAO
         retardValueLbl.setText(String.valueOf(equipmentDAO.countMaintenanceEnRetard()));
         urgentValueLbl.setText(String.valueOf(equipmentDAO.countMaintenanceUrgente()));
         avenirValueLbl.setText(String.valueOf(equipmentDAO.countMaintenanceAVenir()));
 
-        // 2. Vider le tableau
         tableModel.setRowCount(0);
 
-        // 3. Récupérer la liste triée
         List<Equipment> equipements = equipmentDAO.getListePourPlanningMaintenance();
         LocalDate aujourdHui = LocalDate.now();
 
-        // 4. Remplir le tableau avec le calcul des jours
         for (Equipment eq : equipements) {
             
-            // Éviter les erreurs si la date est nulle
             if (eq.getNext_maintenance_date() == null) continue;
             
             LocalDate dateMaintenance = eq.getNext_maintenance_date().toLocalDate();
             
-            // Calculer la différence en jours
             long joursDeDifference = ChronoUnit.DAYS.between(aujourdHui, dateMaintenance);
             
             String delaiTexte = "";
             String prioriteTexte = "";
             
-            // Logique de classification comme sur votre image
             if (joursDeDifference < 0) {
                 delaiTexte = Math.abs(joursDeDifference) + " jours de retard";
                 prioriteTexte = "❌ En retard";
@@ -214,7 +191,6 @@ public class MaintenancePanel extends JPanel {
                 prioriteTexte = "✅ OK";
             }
 
-            // Mettre des émojis pour simuler les badges colorés du "Status actuel"
             String statusActuel = eq.getStatus();
             if ("Fonctionnel".equals(statusActuel)) statusActuel = "🟢 " + statusActuel;
             else if ("En maintenance".equals(statusActuel)) statusActuel = "🟡 " + statusActuel;
@@ -225,8 +201,8 @@ public class MaintenancePanel extends JPanel {
                 eq.getLocation(),
                 statusActuel,
                 eq.getNext_maintenance_date(),
-                delaiTexte,     // Le calcul dynamique !
-                prioriteTexte   // L'étiquette dynamique !
+                delaiTexte,     
+                prioriteTexte   
             };
             tableModel.addRow(row);
         }

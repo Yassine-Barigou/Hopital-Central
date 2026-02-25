@@ -2,7 +2,7 @@ package main.java.com.hospital.gui.panels;
 
 import main.java.com.hospital.dao.EmployeesDAO;
 import main.java.com.hospital.dao.PatientDAO;
-import main.java.com.hospital.model.Consultation;
+import main.java.com.hospital.model.Appointment;
 import main.java.com.hospital.model.Employees;
 import main.java.com.hospital.model.Patient;
 
@@ -10,25 +10,25 @@ import javax.swing.*;
 import java.awt.*;
 import java.sql.Timestamp;
 
-public class ConsultationFormDialog extends JDialog {
+public class AppointmentFormDialog extends JDialog {
 
     private boolean saved = false;
-    private Consultation consultation;
+    private Appointment appointment;
 
     private JComboBox<ComboItem> cbPatients;
     private JComboBox<ComboItem> cbDoctors;
     private JTextField txtDate; 
-    private JTextField txtTime; 
-    private JTextField txtReason;
-    private JTextArea txtDiagnosis;
-    private JTextArea txtPrescription;
+    private JTextField txtTime;
+    private JTextField txtDuration; 
+    private JTextField txtType; 
     private JComboBox<String> cbStatus;
+    private JTextArea txtNotes;
 
-    public ConsultationFormDialog(Consultation c) {
-        this.consultation = c;
-        setTitle(c.getId() == 0 ? "Nouvelle Consultation" : "Modifier Consultation");
+    public AppointmentFormDialog(Appointment a) {
+        this.appointment = a;
+        setTitle(a.getId() == 0 ? "Nouveau Rendez-vous" : "Modifier Rendez-vous");
         setModal(true);
-        setSize(500, 600);
+        setSize(450, 550);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
@@ -40,14 +40,11 @@ public class ConsultationFormDialog extends JDialog {
         loadDropdowns();
 
         txtDate = new JTextField();
-        txtDate.setToolTipText("Ex: 2026-05-14");
         txtTime = new JTextField();
-        txtTime.setToolTipText("Ex: 14:30");
-        
-        txtReason = new JTextField();
-        txtDiagnosis = new JTextArea(3, 20);
-        txtPrescription = new JTextArea(3, 20);
-        cbStatus = new JComboBox<>(new String[]{"Planifiée", "En cours", "Terminée", "Annulée"});
+        txtDuration = new JTextField("30"); 
+        txtType = new JTextField("Consultation standard");
+        cbStatus = new JComboBox<>(new String[]{"En attente", "Confirmé", "Annulé", "Terminé"});
+        txtNotes = new JTextArea(3, 20);
 
         formPanel.add(new JLabel("Patient : *"));
         formPanel.add(cbPatients);
@@ -61,17 +58,17 @@ public class ConsultationFormDialog extends JDialog {
         formPanel.add(new JLabel("Heure (HH:MM) : *"));
         formPanel.add(txtTime);
         
-        formPanel.add(new JLabel("Motif : *"));
-        formPanel.add(txtReason);
-        
-        formPanel.add(new JLabel("Diagnostic :"));
-        formPanel.add(new JScrollPane(txtDiagnosis));
-        
-        formPanel.add(new JLabel("Traitement/Ordonnance :"));
-        formPanel.add(new JScrollPane(txtPrescription));
+        formPanel.add(new JLabel("Durée (minutes) : *"));
+        formPanel.add(txtDuration);
+
+        formPanel.add(new JLabel("Type de visite : *"));
+        formPanel.add(txtType);
         
         formPanel.add(new JLabel("Statut :"));
         formPanel.add(cbStatus);
+        
+        formPanel.add(new JLabel("Notes :"));
+        formPanel.add(new JScrollPane(txtNotes));
 
         add(formPanel, BorderLayout.CENTER);
 
@@ -82,20 +79,18 @@ public class ConsultationFormDialog extends JDialog {
         btnPanel.add(btnCancel);
         add(btnPanel, BorderLayout.SOUTH);
 
-        if (c.getId() != 0) {
-            selectItemById(cbPatients, c.getPatientId());
-            selectItemById(cbDoctors, c.getDoctorId());
-            if (c.getDate() != null) {
-                String fullDate = c.getDate().toString(); // format: "YYYY-MM-DD HH:MM:SS.0"
+        if (a.getId() != 0) {
+            selectItemById(cbPatients, a.getPatientId());
+            selectItemById(cbDoctors, a.getDoctorId());
+            if (a.getDate() != null) {
+                String fullDate = a.getDate().toString();
                 txtDate.setText(fullDate.substring(0, 10));
                 txtTime.setText(fullDate.substring(11, 16));
             }
-            txtReason.setText(c.getReason());
-            txtDiagnosis.setText(c.getDiagnosis());
-            txtPrescription.setText(c.getPrescription());
-            cbStatus.setSelectedItem(c.getStatus());
-        } else {
-            cbStatus.setSelectedItem("Planifiée");
+            txtDuration.setText(String.valueOf(a.getDurationMinutes()));
+            txtType.setText(a.getType());
+            cbStatus.setSelectedItem(a.getStatus());
+            txtNotes.setText(a.getNotes());
         }
 
         btnCancel.addActionListener(e -> dispose());
@@ -127,7 +122,7 @@ public class ConsultationFormDialog extends JDialog {
 
     private void save() {
         if (cbPatients.getSelectedItem() == null || cbDoctors.getSelectedItem() == null ||
-            txtDate.getText().trim().isEmpty() || txtTime.getText().trim().isEmpty() || txtReason.getText().trim().isEmpty()) {
+            txtDate.getText().trim().isEmpty() || txtTime.getText().trim().isEmpty() || txtType.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs obligatoires (*)");
             return;
         }
@@ -136,22 +131,22 @@ public class ConsultationFormDialog extends JDialog {
             ComboItem selectedPatient = (ComboItem) cbPatients.getSelectedItem();
             ComboItem selectedDoc = (ComboItem) cbDoctors.getSelectedItem();
 
-            consultation.setPatientId(selectedPatient.getId());
-            consultation.setDoctorId(selectedDoc.getId());
+            appointment.setPatientId(selectedPatient.getId());
+            appointment.setDoctorId(selectedDoc.getId());
             
             String dateTimeStr = txtDate.getText().trim() + " " + txtTime.getText().trim() + ":00";
-            consultation.setDate(Timestamp.valueOf(dateTimeStr)); 
+            appointment.setDate(Timestamp.valueOf(dateTimeStr));
             
-            consultation.setReason(txtReason.getText().trim());
-            consultation.setDiagnosis(txtDiagnosis.getText().trim());
-            consultation.setPrescription(txtPrescription.getText().trim());
-            consultation.setStatus(cbStatus.getSelectedItem().toString());
+            appointment.setDurationMinutes(Integer.parseInt(txtDuration.getText().trim()));
+            appointment.setType(txtType.getText().trim());
+            appointment.setStatus(cbStatus.getSelectedItem().toString());
+            appointment.setNotes(txtNotes.getText().trim());
 
             saved = true;
             dispose();
             
         } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, "Format de date ou d'heure invalide.\nExemple Date: 2024-05-14\nExemple Heure: 14:30", "Erreur", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Format invalide.\nDate: 2024-05-14\nHeure: 14:30\nDurée: 30", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
 
